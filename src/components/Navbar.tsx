@@ -94,6 +94,10 @@ const Navbar = () => {
               }}>
                     Salary Analysis
                   </a>
+                  <div className="flex items-center px-4 py-2 text-white/70 hover:bg-white/10 transition-colors">
+                    <span>AI Negotiation Chat</span>
+                    <span className="ml-2 text-xs text-cyan/60 font-medium">Coming Soon!</span>
+                  </div>
                 </div>}
             </div>
             
@@ -152,6 +156,10 @@ const Navbar = () => {
             }}>
                     Salary Analysis
                   </a>
+                  <div className="flex items-center justify-center py-2 text-white/70">
+                    <span>AI Negotiation Chat</span>
+                    <span className="ml-2 text-xs text-cyan/60 font-medium">Coming Soon!</span>
+                  </div>
                 </div>}
             </div>
             
