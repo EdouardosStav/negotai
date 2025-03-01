@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/navbar/Navbar";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
 import SalaryAnalysis from "../components/SalaryAnalysis";
