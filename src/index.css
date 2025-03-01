@@ -52,6 +52,16 @@
     @apply scroll-smooth;
   }
 
+  /* Improved typography for better readability */
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-normal leading-[1.3];
+    letter-spacing: 0.01em;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+
   /* Scrollbar styling */
   ::-webkit-scrollbar {
     @apply w-2;
@@ -80,6 +90,7 @@
     display: none;
   }
 
+  /* Improved glassmorphism effect for a more modern look */
   .glass-card {
     @apply backdrop-blur-lg bg-white/5 border border-white/10 shadow-xl;
   }

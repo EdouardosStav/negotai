@@ -52,11 +52,11 @@ const Hero = () => {
           </span>
         </div>
         
-        <h1 className="text-gradient text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+        <h1 className="text-gradient text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-[1.2] tracking-normal">
           Get the Salary You Deserve – AI-Powered Salary Negotiation for Job Offers
         </h1>
         
-        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-12">
+        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
           AI-powered salary insights and negotiation strategies tailored to your skills and experience.
         </p>
         
@@ -70,11 +70,6 @@ const Hero = () => {
             Analyze My Offer
             <ArrowRight className="inline-block ml-2 group-hover:translate-x-1 transition-transform duration-300" size={18} />
           </a>
-          <div className="flex items-center text-xs text-white/60 mt-2 sm:mt-0 justify-center">
-            <a href="#privacy" className="hover:text-white mr-3 transition-colors">Privacy Policy</a>
-            <span className="mx-2">•</span>
-            <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
-          </div>
         </div>
         
         <div className="flex justify-center">

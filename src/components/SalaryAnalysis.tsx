@@ -83,7 +83,7 @@ const SalaryAnalysis = () => {
                       name="jobTitle"
                       value={formData.jobTitle}
                       onChange={handleChange}
-                      placeholder="e.g. Software Engineer"
+                      placeholder="Software Engineer"
                       className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
                       required
                     />
@@ -119,7 +119,7 @@ const SalaryAnalysis = () => {
                       name="location"
                       value={formData.location}
                       onChange={handleChange}
-                      placeholder="e.g. San Francisco, CA"
+                      placeholder="San Francisco, CA"
                       className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
                       required
                     />
@@ -139,7 +139,7 @@ const SalaryAnalysis = () => {
                         name="salary"
                         value={formData.salary}
                         onChange={handleChange}
-                        placeholder="e.g. 120000"
+                        placeholder="120000"
                         className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
                         required
                       />
@@ -154,31 +154,34 @@ const SalaryAnalysis = () => {
                   >
                     Analyze My Offer
                   </button>
-                  
-                  <div className="flex items-center justify-center text-xs text-white/60 mt-1">
-                    <a href="#privacy" className="hover:text-white mr-3 transition-colors">Privacy Policy</a>
-                    <span className="mx-2">•</span>
-                    <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
-                  </div>
                 </div>
               </form>
+              
+              {/* Privacy links moved below the form */}
+              <div className="flex items-center justify-center text-xs text-white/60 mt-4">
+                <a href="#privacy" className="hover:text-white mr-3 transition-colors">Privacy Policy</a>
+                <span className="mx-2">•</span>
+                <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
+              </div>
             </div>
             
-            {/* Results Section */}
-            <div className="glass-card p-8 rounded-xl">
+            {/* Results Section - Enhanced with glassmorphism and better typography */}
+            <div className="glass-card p-8 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
               {!formSubmitted ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <div className="h-32 w-32 rounded-full bg-white/5 flex items-center justify-center mb-6 animate-pulse">
+                <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
+                  <div className="h-32 w-32 rounded-full bg-white/5 flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(0,140,255,0.2)]">
                     <ChartIcon />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-3">Insights Preview</h3>
-                  <p className="text-white/70 mb-4">
+                  <p className="text-white/70 mb-4 leading-relaxed">
                     Submit your offer details to get personalized salary insights and negotiation strategies.
                   </p>
-                  <div className="bg-white/5 border border-white/10 p-4 rounded-lg text-left text-sm text-white/80">
-                    <p className="mb-2">Example insights:</p>
-                    <p className="mb-2">"Your salary offer is 15% below market value. Consider negotiating for $135K – $145K."</p>
-                    <p>"Companies in your industry typically offer 10% signing bonuses – include this in your counteroffer!"</p>
+                  <div className="glass-card p-5 rounded-lg text-left text-sm text-white/80 shadow-lg space-y-3 w-full">
+                    <p className="font-medium text-white mb-2">Example insights:</p>
+                    <div className="space-y-3">
+                      <p className="py-1.5 px-2 bg-white/5 rounded-md">Your salary offer is 15% below market value. Consider negotiating for $135K – $145K.</p>
+                      <p className="py-1.5 px-2 bg-white/5 rounded-md">Companies in your industry typically offer 10% signing bonuses – include this in your counteroffer!</p>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -246,7 +249,7 @@ const SalaryAnalysis = () => {
   );
 };
 
-// Chart icon SVG component
+// Chart icon SVG component - Increased size and improved color
 const ChartIcon = () => (
   <svg 
     width="64" 
@@ -254,7 +257,7 @@ const ChartIcon = () => (
     viewBox="0 0 24 24" 
     fill="none" 
     xmlns="http://www.w3.org/2000/svg"
-    className="text-cyan/80"
+    className="text-cyan"
   >
     <path d="M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     <path d="M20 8L16.0811 12.1827C15.9326 12.3412 15.8584 12.4204 15.7688 12.4614C15.6897 12.4976 15.6026 12.5125 15.516 12.5047C15.418 12.4958 15.3250 12.4522 15.1391 12.365L11.8609 10.635C11.6751 10.5478 11.582 10.5042 11.484 10.4953C11.3975 10.4875 11.3104 10.5024 11.2313 10.5386C11.1416 10.5796 11.0674 10.6588 10.919 10.8173L7 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
