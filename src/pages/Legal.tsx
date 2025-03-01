@@ -1,23 +1,22 @@
-
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
 const Legal = () => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState("terms");
-  
   useEffect(() => {
     // Set page title
     document.title = "Legal Information - NegotAI";
-    
+
     // Handle direct navigation to sections
     if (location.state && location.state.section) {
       setActiveSection(location.state.section);
       const element = document.getElementById(location.state.section);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({
+          behavior: "smooth"
+        });
       }
     } else if (location.hash) {
       // Handle URL hash without state (e.g., /legal#privacy)
@@ -25,58 +24,39 @@ const Legal = () => {
       setActiveSection(section);
       const element = document.getElementById(section);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({
+          behavior: "smooth"
+        });
       }
     }
   }, [location]);
-
   const handleNavClick = (section: string) => {
     setActiveSection(section);
     const element = document.getElementById(section);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      element.scrollIntoView({
+        behavior: "smooth"
+      });
     }
   };
-
-  return (
-    <div className="min-h-screen bg-navy">
+  return <div className="min-h-screen bg-navy">
       <Navbar />
       
       <main className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-12 text-center">Legal Information</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-12 text-center py-[7px]">Legal Information</h1>
         
         {/* Section Navigation */}
         <div className="flex flex-wrap justify-center mb-10 sticky top-20 z-10 bg-navy/80 backdrop-blur-md py-4 rounded-lg">
-          <button
-            onClick={() => handleNavClick("terms")}
-            className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${
-              activeSection === "terms" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"
-            }`}
-          >
+          <button onClick={() => handleNavClick("terms")} className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${activeSection === "terms" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
             Terms of Service
           </button>
-          <button
-            onClick={() => handleNavClick("privacy")}
-            className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${
-              activeSection === "privacy" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"
-            }`}
-          >
+          <button onClick={() => handleNavClick("privacy")} className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${activeSection === "privacy" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
             Privacy Policy
           </button>
-          <button
-            onClick={() => handleNavClick("cookies")}
-            className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${
-              activeSection === "cookies" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"
-            }`}
-          >
+          <button onClick={() => handleNavClick("cookies")} className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${activeSection === "cookies" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
             Cookie Policy
           </button>
-          <button
-            onClick={() => handleNavClick("gdpr")}
-            className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${
-              activeSection === "gdpr" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"
-            }`}
-          >
+          <button onClick={() => handleNavClick("gdpr")} className={`px-4 py-2 mx-2 my-1 rounded-md transition-colors ${activeSection === "gdpr" ? "bg-primary text-white" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
             GDPR
           </button>
         </div>
@@ -88,7 +68,11 @@ const Legal = () => {
             <h2 className="text-3xl font-bold text-white mb-6">Terms of Service</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-white/80">
-                Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                Last updated: {new Date().toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
               </p>
               
               <h3 className="text-xl font-semibold text-white mt-6">1. Acceptance of Terms</h3>
@@ -123,7 +107,11 @@ const Legal = () => {
             <h2 className="text-3xl font-bold text-white mb-6">Privacy Policy</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-white/80">
-                Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                Last updated: {new Date().toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
               </p>
               
               <h3 className="text-xl font-semibold text-white mt-6">1. Information We Collect</h3>
@@ -158,7 +146,11 @@ const Legal = () => {
             <h2 className="text-3xl font-bold text-white mb-6">Cookie Policy</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-white/80">
-                Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                Last updated: {new Date().toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
               </p>
               
               <h3 className="text-xl font-semibold text-white mt-6">1. What Are Cookies</h3>
@@ -188,7 +180,11 @@ const Legal = () => {
             <h2 className="text-3xl font-bold text-white mb-6">GDPR Compliance</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-white/80">
-                Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                Last updated: {new Date().toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
               </p>
               
               <h3 className="text-xl font-semibold text-white mt-6">1. Data Controller</h3>
@@ -221,8 +217,6 @@ const Legal = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Legal;
