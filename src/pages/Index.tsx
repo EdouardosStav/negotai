@@ -50,8 +50,11 @@ const Index = () => {
     document.head.appendChild(style);
     
     // Handle scrolling from other pages
-    if (location.state && location.state.scrollTo && !initialized.current) {
-      const sectionId = location.state.scrollTo;
+    if ((location.state && location.state.scrollTo && !initialized.current) || 
+        (location.hash === '#analyze') || 
+        sessionStorage.getItem('scrollToAnalysis')) {
+      
+      const sectionId = location.state?.scrollTo || 'analyze';
       const section = document.getElementById(sectionId);
       
       if (section) {
@@ -62,6 +65,8 @@ const Index = () => {
             block: 'start'
           });
           initialized.current = true;
+          // Clear the flag after scrolling
+          sessionStorage.removeItem('scrollToAnalysis');
         }, 500);
       }
     }

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown, LogOut, User as UserIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -23,7 +22,6 @@ const Navbar = () => {
     };
     window.addEventListener("scroll", handleScroll);
 
-    // Click outside to close dropdowns
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsFeatureDropdownOpen(false);
@@ -48,9 +46,7 @@ const Navbar = () => {
   };
 
   const scrollToSection = (sectionId: string) => {
-    // Check if we're on the home page
     if (window.location.pathname !== '/') {
-      // If not, navigate to home and then scroll after page loads
       window.location.href = `/#${sectionId}`;
       return;
     }
@@ -88,7 +84,6 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               <Link to="/" className="nav-link" onClick={e => {
                 if (window.location.pathname === '/') {
@@ -99,7 +94,6 @@ const Navbar = () => {
                 Home
               </Link>
               
-              {/* Features Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <button 
                   className="nav-link flex items-center" 
@@ -139,8 +133,13 @@ const Navbar = () => {
                 Contact
               </button>
               
+              {isAuthenticated && (
+                <Link to="/dashboard" className="nav-link">
+                  Dashboard
+                </Link>
+              )}
+              
               {isAuthenticated ? (
-                /* User dropdown when logged in */
                 <div className="relative" ref={userDropdownRef}>
                   <button 
                     onClick={toggleUserDropdown}
@@ -174,7 +173,6 @@ const Navbar = () => {
                   )}
                 </div>
               ) : (
-                /* Sign in button when logged out */
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -190,13 +188,11 @@ const Navbar = () => {
               )}
             </nav>
 
-            {/* Mobile Menu Button */}
             <button className="md:hidden text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
-          {/* Mobile Navigation */}
           {isMobileMenuOpen && (
             <nav className="md:hidden flex flex-col items-center space-y-4 pt-6 pb-6 animate-fade-in">
               <Link to="/" className="text-white hover:text-cyan transition-colors" onClick={e => {
@@ -209,7 +205,6 @@ const Navbar = () => {
                 Home
               </Link>
               
-              {/* Mobile Features Dropdown */}
               <div className="w-full text-center">
                 <button className="text-white hover:text-cyan transition-colors flex items-center justify-center w-full" onClick={toggleFeatureDropdown}>
                   Features <ChevronDown size={16} className="ml-1" />
@@ -243,6 +238,16 @@ const Navbar = () => {
                 Contact
               </button>
               
+              {isAuthenticated && (
+                <Link 
+                  to="/dashboard" 
+                  className="text-white hover:text-cyan transition-colors" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              )}
+              
               {isAuthenticated ? (
                 <>
                   <Link 
@@ -270,7 +275,6 @@ const Navbar = () => {
         </div>
       </header>
       
-      {/* Contact Modal */}
       <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
     </>
   );

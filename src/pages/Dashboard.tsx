@@ -102,17 +102,9 @@ const Dashboard = () => {
   
   // Handle create new analysis click
   const handleCreateNewAnalysis = () => {
-    if (window.location.pathname === '/') {
-      // If on home page, scroll to analysis section
-      const analysisSection = document.getElementById('analyze');
-      if (analysisSection) {
-        analysisSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      // If not on home page, navigate to home and set flag to scroll
-      sessionStorage.setItem('scrollToAnalysis', 'true');
-      navigate('/#analyze');
-    }
+    // Set flag to scroll to analysis section after navigation
+    sessionStorage.setItem('scrollToAnalysis', 'true');
+    navigate('/#analyze');
   };
 
   if (authLoading || isLoadingProfile) {

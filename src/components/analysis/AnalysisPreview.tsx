@@ -30,7 +30,7 @@ const AnalysisPreview: React.FC<AnalysisPreviewProps> = ({ handleSampleView, sam
         <p className="font-medium text-white mb-2">Example insights:</p>
         <div className="space-y-3">
           {/* Static sample insights that don't update with form changes */}
-          <p className="py-1.5 px-2 bg-white/5 rounded-md">Your salary offer is 15% below market value for a {sampleData.jobLevel} role. Consider negotiating for $135K – $145K.</p>
+          <p className="py-1.5 px-2 bg-white/5 rounded-md">Your salary offer is 15% below market value for a Senior role. Consider negotiating for $135K – $145K.</p>
           <p className="py-1.5 px-2 bg-white/5 rounded-md">Your benefits package is below industry standard. Request additional PTO days and higher equity percentage.</p>
         </div>
       </div>

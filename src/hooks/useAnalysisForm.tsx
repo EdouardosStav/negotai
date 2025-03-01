@@ -69,10 +69,7 @@ export const useAnalysisForm = () => {
       
       setFormSubmitted(true);
       
-      // Auto-save for authenticated users
-      if (isAuthenticated && user) {
-        await handleSaveAnalysis();
-      }
+      // Don't auto-save, let the user decide to save
     } catch (error) {
       console.error("Error analyzing offer:", error);
       toast.error("Failed to analyze offer. Please try again.");
@@ -123,7 +120,7 @@ export const useAnalysisForm = () => {
     try {
       setIsSaving(true);
       await saveSalaryAnalysis(user.id, formData, analysisResults);
-      toast.success("Analysis saved successfully");
+      toast.success("Analysis saved successfully to your dashboard");
       navigate("/dashboard");
     } catch (error) {
       console.error("Error saving analysis:", error);
