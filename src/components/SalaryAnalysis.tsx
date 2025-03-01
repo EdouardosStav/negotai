@@ -1,10 +1,19 @@
+
 import { useState, useEffect, useRef } from "react";
-import { CheckCircle, AlertCircle, DollarSign, ShieldCheck, Building, Gift, Award, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CheckCircle, AlertCircle, DollarSign, ShieldCheck, Building, Gift, Award, Clock, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAuth } from "@/context/AuthContext";
+import { saveSalaryAnalysis, SalaryAnalysisInput } from "@/services/analysisService";
+import { toast } from "sonner";
 
 const SalaryAnalysis = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<SalaryAnalysisInput>({
     jobTitle: "",
     experience: "",
     location: "",
@@ -13,6 +22,10 @@ const SalaryAnalysis = () => {
     benefitsPackage: "",
     jobLevel: "",
     employmentType: "Full-Time"
+  });
+  const [analysisResults, setAnalysisResults] = useState({
+    fairnessScore: 80,
+    suggestedCounteroffer: 0
   });
   const analysisRef = useRef<HTMLDivElement>(null);
 
@@ -48,10 +61,37 @@ const SalaryAnalysis = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted, would require auth before showing full results");
-    setFormSubmitted(true);
+    
+    // Basic validation
+    if (!formData.jobTitle || !formData.location || !formData.salary || !formData.experience) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    try {
+      setIsAnalyzing(true);
+      
+      // Calculate suggested counteroffer (12% increase)
+      const salary = typeof formData.salary === 'string' ? parseFloat(formData.salary) : formData.salary;
+      const suggestedCounteroffer = Math.round(salary * 1.12);
+      
+      // Simulate API call with timeout
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setAnalysisResults({
+        fairnessScore: 80, // Mock score
+        suggestedCounteroffer
+      });
+      
+      setFormSubmitted(true);
+    } catch (error) {
+      console.error("Error analyzing offer:", error);
+      toast.error("Failed to analyze offer. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleSampleView = () => {
@@ -65,7 +105,36 @@ const SalaryAnalysis = () => {
       jobLevel: "Senior",
       employmentType: "Full-Time"
     });
+    
+    setAnalysisResults({
+      fairnessScore: 80,
+      suggestedCounteroffer: 134400 // 120000 * 1.12
+    });
+    
     setFormSubmitted(true);
+  };
+
+  const handleSaveAnalysis = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    
+    try {
+      setIsSaving(true);
+      await saveSalaryAnalysis(user.id, formData, analysisResults);
+      toast.success("Analysis saved successfully");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error saving analysis:", error);
+      toast.error("Failed to save analysis. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const redirectToAuth = () => {
+    navigate("/auth");
   };
 
   return (
@@ -239,23 +308,22 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button 
-                          type="submit" 
-                          className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
-                            w-full transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
-                            bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
-                        >
-                          Analyze My Offer
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-navy-dark border border-white/10 text-white">
-                        <p>Sign in to unlock AI-powered salary analysis</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <button 
+                    type="submit" 
+                    className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
+                      w-full transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
+                      bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
+                    disabled={isAnalyzing}
+                  >
+                    {isAnalyzing ? (
+                      <div className="flex items-center justify-center">
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Analyzing...
+                      </div>
+                    ) : (
+                      "Analyze My Offer"
+                    )}
+                  </button>
                 </div>
               </form>
               
@@ -296,19 +364,19 @@ const SalaryAnalysis = () => {
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-bold text-white">Offer Analysis</h3>
                     <div className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium text-white/80">
-                      Sample Preview
+                      {user ? "Full Analysis" : "Sample Preview"}
                     </div>
                   </div>
                   
                   <div className="mb-6">
                     <div className="flex justify-between mb-2">
                       <span className="text-white/80">Fairness Score</span>
-                      <span className="text-amber-400 font-medium">80%</span>
+                      <span className="text-amber-400 font-medium">{analysisResults.fairnessScore}%</span>
                     </div>
                     <div className="w-full bg-white/10 rounded-full h-2">
                       <div 
                         className="bg-gradient-to-r from-amber-500 to-green-500 h-2 rounded-full" 
-                        style={{ width: "80%" }}
+                        style={{ width: `${analysisResults.fairnessScore}%` }}
                       ></div>
                     </div>
                     <p className="text-white/70 text-xs mt-2">
@@ -367,7 +435,7 @@ const SalaryAnalysis = () => {
                       <span className="font-medium text-white">Suggested Counter-Offer:</span>
                     </p>
                     <p className="text-2xl font-bold text-gradient">
-                      ${formData.salary ? (parseInt(formData.salary) * 1.12).toLocaleString() : "0"}
+                      ${analysisResults.suggestedCounteroffer.toLocaleString()}
                     </p>
                     <p className="text-white/70 text-xs mt-1">
                       12% increase with strong justification based on market data
@@ -382,18 +450,29 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button className="w-full mt-6 py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 text-sm">
-                          Sign in for Full Analysis & Report
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-navy-dark border border-white/10 text-white">
-                        <p>Sign in to access your personalized report</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {user ? (
+                    <button
+                      onClick={handleSaveAnalysis}
+                      className="w-full mt-6 py-2.5 px-4 rounded-lg bg-gradient-to-r from-primary/80 to-primary text-white hover:from-primary hover:to-primary/80 transition-all duration-300 text-sm"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <div className="flex items-center justify-center">
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Saving...
+                        </div>
+                      ) : (
+                        "Save Analysis to Dashboard"
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={redirectToAuth}
+                      className="w-full mt-6 py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 text-sm"
+                    >
+                      Sign in for Full Analysis & Report
+                    </button>
+                  )}
                 </div>
               )}
             </div>
