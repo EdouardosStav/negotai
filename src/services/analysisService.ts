@@ -22,6 +22,9 @@ export const analyzeSalaryOffer = async (data: SalaryAnalysisInput, userId: stri
       throw new Error(`Failed to analyze salary offer: ${error.message}`);
     }
 
+    // Log successful response for debugging
+    console.log("Raw response from analyze-salary function:", response);
+    
     // If response is not in expected format, return a fallback response
     if (!response || !response.analysis) {
       console.warn('Invalid response from analyze-salary function:', response);
