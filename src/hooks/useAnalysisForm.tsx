@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { SalaryAnalysisInput, analyzeSalaryOffer, saveSalaryAnalysis } from "@/services/analysisService";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAnalysisForm = () => {
   const navigate = useNavigate();

@@ -54,6 +54,8 @@ export type Database = {
           negotiation_status: string;
           created_at: string;
           updated_at: string;
+          ai_analysis: any | null;
+          analysis_prompt: string | null;
         };
         Insert: {
           id?: string;
@@ -71,6 +73,8 @@ export type Database = {
           negotiation_status?: string;
           created_at?: string;
           updated_at?: string;
+          ai_analysis?: any | null;
+          analysis_prompt?: string | null;
         };
         Update: {
           id?: string;
@@ -88,6 +92,8 @@ export type Database = {
           negotiation_status?: string;
           created_at?: string;
           updated_at?: string;
+          ai_analysis?: any | null;
+          analysis_prompt?: string | null;
         };
       };
     };
