@@ -9,7 +9,6 @@ import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import NegotiationGuide from "./pages/NegotiationGuide";
-import SalaryData from "./pages/SalaryData";
 import FAQ from "./pages/FAQ";
 import Legal from "./pages/Legal";
 
@@ -26,7 +25,6 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/about" element={<About />} />
           <Route path="/negotiation-guide" element={<NegotiationGuide />} />
-          <Route path="/salary-data" element={<SalaryData />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/legal" element={<Legal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

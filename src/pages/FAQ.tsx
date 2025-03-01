@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
-import { Mail, Heart } from "lucide-react"; // Added Mail import
+import { Heart } from "lucide-react";
 
 interface FAQItem {
   question: string;
@@ -62,7 +62,6 @@ const FAQ = () => {
             <li>Consult industry-specific salary reports</li>
             <li>Network with professionals in similar roles</li>
             <li>Speak with recruiters who specialize in your field</li>
-            <li>Review our <Link to="/salary-data" className="text-cyan hover:underline">Salary Data</Link> page for industry-specific insights</li>
           </ul>
         </div>
       ),
@@ -191,25 +190,6 @@ const FAQ = () => {
       ),
       category: "pricing",
     },
-    {
-      question: "Do you offer discounts for students or educational institutions?",
-      answer: (
-        <div>
-          <p>
-            Yes, we offer special pricing for:
-          </p>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>Students: 50% discount on Premium plans with valid student ID</li>
-            <li>Educational institutions: Custom pricing based on user volume</li>
-            <li>Career centers: Special packages including group workshops</li>
-          </ul>
-          <p className="mt-2">
-            Contact our team at <a href="mailto:education@negotiai.com" className="text-cyan hover:underline">education@negotiai.com</a> for details and verification procedures.
-          </p>
-        </div>
-      ),
-      category: "pricing",
-    },
     
     // Support & Contact
     {
@@ -217,16 +197,17 @@ const FAQ = () => {
       answer: (
         <div>
           <p>
-            We offer multiple support channels:
-          </p>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>Email support: <a href="mailto:support@negotiai.com" className="text-cyan hover:underline">support@negotiai.com</a> (24-48 hour response time)</li>
-            <li>Live chat: Available Monday-Friday, 9am-5pm EST</li>
-            <li>Help Center: Extensive documentation and troubleshooting guides</li>
-            <li>Community forums: Connect with other users and our support team</li>
-          </ul>
-          <p className="mt-2">
-            Premium and Enterprise plan members receive priority support with faster response times.
+            You can connect with us via the <button 
+              onClick={() => {
+                const contactButton = document.querySelector('button.nav-link[data-target="contact"]');
+                if (contactButton) {
+                  contactButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                }
+              }} 
+              className="text-cyan hover:underline bg-transparent border-none p-0 cursor-pointer"
+            >
+              Contact
+            </button> page.
           </p>
         </div>
       ),
@@ -379,13 +360,6 @@ const FAQ = () => {
               We're here to help. Reach out to our support team for personalized assistance with any questions or concerns.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:support@negotiai.com"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-md bg-white/10 text-white hover:bg-white/20 transition-colors"
-              >
-                <Mail size={18} className="mr-2" />
-                Email Support
-              </a>
               <button
                 onClick={handleContactClick}
                 className="inline-flex items-center justify-center px-6 py-3 rounded-md bg-gradient-to-r from-cyan to-blue-500 text-white hover:opacity-90 transition-opacity"

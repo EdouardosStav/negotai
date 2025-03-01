@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -82,14 +83,14 @@ const Navbar = () => {
                   Features <ChevronDown size={16} className="ml-1" />
                 </button>
                 
-                {isFeatureDropdownOpen && <div className="absolute top-full left-0 mt-1 py-2 w-48 bg-navy-dark/90 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg z-50 animate-fade-in" onMouseLeave={() => setIsFeatureDropdownOpen(false)}>
-                    <a href="#analyze" className="block px-4 py-2 text-white hover:bg-white/10 transition-colors" onClick={e => {
+                {isFeatureDropdownOpen && <div className="absolute top-full left-0 mt-1 py-2 w-48 bg-navy-dark/95 backdrop-blur-lg border border-purple-500/20 rounded-lg shadow-lg shadow-purple-500/10 z-50 animate-fade-in" onMouseLeave={() => setIsFeatureDropdownOpen(false)}>
+                    <a href="#analyze" className="block px-4 py-2 text-white hover:bg-purple-500/20 transition-colors" onClick={e => {
                   e.preventDefault();
                   scrollToSection("analyze");
                 }}>
                       Salary Analysis
                     </a>
-                    <div className="flex items-center px-4 py-2 text-white/70 hover:bg-white/10 transition-colors">
+                    <div className="flex items-center px-4 py-2 text-white/70 hover:bg-purple-500/20 transition-colors">
                       <span className="px-0 mx-[5px]">AI Negotiation Chat</span>
                       <span className="ml-2 text-xs text-cyan/60 font-medium">Coming Soon!</span>
                     </div>
@@ -99,7 +100,7 @@ const Navbar = () => {
               <Link to="/pricing" className="nav-link">Pricing</Link>
               <Link to="/about" className="nav-link">About</Link>
               
-              <button className="nav-link" onClick={openContactModal}>
+              <button className="nav-link" data-target="contact" onClick={openContactModal}>
                 Contact
               </button>
               
@@ -141,7 +142,7 @@ const Navbar = () => {
                   Features <ChevronDown size={16} className="ml-1" />
                 </button>
                 
-                {isFeatureDropdownOpen && <div className="mt-2 py-2 bg-navy-light/50 rounded-lg animate-fade-in">
+                {isFeatureDropdownOpen && <div className="mt-2 py-2 bg-purple-500/20 rounded-lg animate-fade-in">
                     <a href="#analyze" className="block py-2 text-white hover:text-cyan transition-colors" onClick={e => {
                 e.preventDefault();
                 scrollToSection("analyze");
@@ -163,7 +164,7 @@ const Navbar = () => {
                 About
               </Link>
               
-              <button className="text-white hover:text-cyan transition-colors" onClick={openContactModal}>
+              <button className="text-white hover:text-cyan transition-colors" data-target="contact" onClick={openContactModal}>
                 Contact
               </button>
               

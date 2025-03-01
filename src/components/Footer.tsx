@@ -89,9 +89,6 @@ const Footer = () => {
                   <Link to="/negotiation-guide" className="text-white/70 hover:text-white transition-colors">Negotiation Guide</Link>
                 </li>
                 <li>
-                  <Link to="/salary-data" className="text-white/70 hover:text-white transition-colors">Salary Data</Link>
-                </li>
-                <li>
                   <button 
                     onClick={() => scrollToSection("testimonials")} 
                     className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
