@@ -1,18 +1,20 @@
 
 import { useState } from "react";
 import { Mail, Github, Twitter, Linkedin, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import ContactModal from "./ContactModal";
 
 const Footer = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const scrollToSection = (sectionId: string) => {
     // Check if we're on the home page
-    if (window.location.pathname !== '/') {
+    if (location.pathname !== '/') {
       // If not, navigate to home and then scroll after page loads
-      window.location.href = `/#${sectionId}`;
+      navigate('/', { state: { scrollTo: sectionId } });
       return;
     }
     
@@ -22,6 +24,10 @@ const Footer = () => {
         behavior: "smooth"
       });
     }
+  };
+  
+  const handleLegalClick = (section: string) => {
+    navigate('/legal', { state: { section } });
   };
   
   return (
@@ -42,16 +48,16 @@ const Footer = () => {
                 AI-powered salary insights and negotiation strategies tailored to your skills and experience.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all">
+                <a href="https://twitter.com/negotiai" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all" aria-label="Twitter">
                   <Twitter size={16} className="text-white" />
                 </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all">
+                <a href="https://linkedin.com/company/negotiai" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all" aria-label="LinkedIn">
                   <Linkedin size={16} className="text-white" />
                 </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all">
+                <a href="https://github.com/negotiai" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all" aria-label="GitHub">
                   <Github size={16} className="text-white" />
                 </a>
-                <a href="mailto:support@negotiai.com" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all">
+                <a href="mailto:support@negotiai.com" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all" aria-label="Email">
                   <Mail size={16} className="text-white" />
                 </a>
               </div>
@@ -65,7 +71,12 @@ const Footer = () => {
                   <Link to="/about" className="text-white/70 hover:text-white transition-colors">About Us</Link>
                 </li>
                 <li>
-                  <button onClick={() => setIsContactModalOpen(true)} className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">Contact Us</button>
+                  <button 
+                    onClick={() => setIsContactModalOpen(true)} 
+                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
+                  >
+                    Contact Us
+                  </button>
                 </li>
               </ul>
             </div>
@@ -99,16 +110,36 @@ const Footer = () => {
               <h3 className="text-white font-bold mb-4">Legal</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/legal#terms" className="text-white/70 hover:text-white transition-colors">Terms of Service</Link>
+                  <button 
+                    onClick={() => handleLegalClick("terms")} 
+                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
+                  >
+                    Terms of Service
+                  </button>
                 </li>
                 <li>
-                  <Link to="/legal#privacy" className="text-white/70 hover:text-white transition-colors">Privacy Policy</Link>
+                  <button 
+                    onClick={() => handleLegalClick("privacy")} 
+                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
+                  >
+                    Privacy Policy
+                  </button>
                 </li>
                 <li>
-                  <Link to="/legal#cookies" className="text-white/70 hover:text-white transition-colors">Cookie Policy</Link>
+                  <button 
+                    onClick={() => handleLegalClick("cookies")} 
+                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
+                  >
+                    Cookie Policy
+                  </button>
                 </li>
                 <li>
-                  <Link to="/legal#gdpr" className="text-white/70 hover:text-white transition-colors">GDPR</Link>
+                  <button 
+                    onClick={() => handleLegalClick("gdpr")} 
+                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
+                  >
+                    GDPR
+                  </button>
                 </li>
               </ul>
             </div>

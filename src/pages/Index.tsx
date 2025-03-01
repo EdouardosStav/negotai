@@ -1,5 +1,6 @@
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
@@ -8,6 +9,9 @@ import Testimonials from "../components/Testimonials";
 import Footer from "../components/Footer";
 
 const Index = () => {
+  const location = useLocation();
+  const initialized = useRef(false);
+
   useEffect(() => {
     // Update page title
     document.title = "NegotAI - AI-Powered Salary Negotiation";
@@ -45,6 +49,23 @@ const Index = () => {
     `;
     document.head.appendChild(style);
     
+    // Handle scrolling from other pages
+    if (location.state && location.state.scrollTo && !initialized.current) {
+      const sectionId = location.state.scrollTo;
+      const section = document.getElementById(sectionId);
+      
+      if (section) {
+        // Use setTimeout to ensure the DOM is fully loaded
+        setTimeout(() => {
+          section.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          initialized.current = true;
+        }, 500);
+      }
+    }
+    
     // Clean up
     return () => {
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -52,7 +73,7 @@ const Index = () => {
       });
       document.head.removeChild(style);
     };
-  }, []);
+  }, [location]);
 
   return (
     <div className="min-h-screen bg-navy overflow-x-hidden">
@@ -65,7 +86,9 @@ const Index = () => {
         <div id="analyze">
           <SalaryAnalysis />
         </div>
-        <Testimonials />
+        <div id="testimonials">
+          <Testimonials />
+        </div>
       </main>
       <Footer />
     </div>
