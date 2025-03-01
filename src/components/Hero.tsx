@@ -1,0 +1,91 @@
+
+import { useEffect, useRef } from "react";
+import { ArrowRight } from "lucide-react";
+
+const Hero = () => {
+  const heroRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("opacity-100");
+            entry.target.classList.remove("opacity-0", "translate-y-10");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    
+    const heroEl = heroRef.current;
+    if (heroEl) {
+      observer.observe(heroEl);
+    }
+    
+    return () => {
+      if (heroEl) {
+        observer.unobserve(heroEl);
+      }
+    };
+  }, []);
+
+  return (
+    <section 
+      className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden"
+      id="hero"
+    >
+      {/* Background elements */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-cyan/5 to-transparent"></div>
+      <div className="absolute bottom-0 left-0 w-3/4 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
+      <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-cyan/5 blur-3xl"></div>
+      <div className="absolute bottom-1/3 left-10 w-40 h-40 rounded-full bg-primary/5 blur-3xl"></div>
+      
+      <div 
+        ref={heroRef}
+        className="container mx-auto px-4 text-center relative z-10 opacity-0 translate-y-10 transition-all duration-1000 ease-out"
+      >
+        <div className="mb-8 flex justify-center">
+          <span className="inline-block px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-cyan animate-pulse">
+            AI-Powered Salary Negotiation
+          </span>
+        </div>
+        
+        <h1 className="text-gradient text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+          Negotiate Your Salary With Confidence
+        </h1>
+        
+        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-12">
+          AI-powered salary insights and negotiation strategies tailored to your skills and experience.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+          <a href="#analyze" className="cta-button group">
+            Analyze My Offer
+            <ArrowRight className="inline-block ml-2 group-hover:translate-x-1 transition-transform duration-300" size={18} />
+          </a>
+          <a href="#features" className="py-3 px-6 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300">
+            See How It Works
+          </a>
+        </div>
+        
+        <div className="flex justify-center">
+          <div className="glass-card px-6 py-4 rounded-lg flex items-center justify-center gap-4 max-w-sm animate-float">
+            <div className="flex items-center">
+              <span className="h-3 w-3 rounded-full bg-success mr-2"></span>
+              <span className="text-sm text-white/80">5,293+ Successful Negotiations</span>
+            </div>
+            <div className="h-10 w-px bg-white/10"></div>
+            <div className="flex items-center">
+              <span className="h-3 w-3 rounded-full bg-premium mr-2"></span>
+              <span className="text-sm text-white/80">$1.2M+ Salary Increases</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Hero;
