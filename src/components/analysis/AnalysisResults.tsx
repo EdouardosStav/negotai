@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Building, CheckCircle, Gift, Award, Clock, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -61,7 +62,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 
   // Fix for TS2363 error - ensure we are using number values for calculations
   const getPercentIncrease = () => {
-    const offeredSalary = formData?.salary ? Number(formData.salary) : (analysis?.offered_salary || 100000);
+    // Convert salary to number if it's a string
+    const offeredSalary = formData?.salary ? 
+      (typeof formData.salary === 'string' ? Number(formData.salary) : formData.salary) : 
+      (analysis?.offered_salary || 100000);
+    
     return Math.round((suggestedCounteroffer / offeredSalary - 1) * 100);
   };
 
