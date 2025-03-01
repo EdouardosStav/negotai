@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
-import { CheckCircle, AlertCircle, DollarSign } from "lucide-react";
+import { CheckCircle, AlertCircle, DollarSign, ShieldCheck } from "lucide-react";
 
 const SalaryAnalysis = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -148,10 +148,18 @@ const SalaryAnalysis = () => {
                   
                   <button 
                     type="submit"
-                    className="cta-button w-full mt-4"
+                    className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
+                    w-full transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
+                    bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
                   >
                     Analyze My Offer
                   </button>
+                  
+                  <div className="flex items-center justify-center text-xs text-white/60 mt-1">
+                    <a href="#privacy" className="hover:text-white mr-3 transition-colors">Privacy Policy</a>
+                    <span className="mx-2">•</span>
+                    <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
+                  </div>
                 </div>
               </form>
             </div>
@@ -164,9 +172,14 @@ const SalaryAnalysis = () => {
                     <ChartIcon />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-3">Insights Preview</h3>
-                  <p className="text-white/70">
+                  <p className="text-white/70 mb-4">
                     Submit your offer details to get personalized salary insights and negotiation strategies.
                   </p>
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-lg text-left text-sm text-white/80">
+                    <p className="mb-2">Example insights:</p>
+                    <p className="mb-2">"Your salary offer is 15% below market value. Consider negotiating for $135K – $145K."</p>
+                    <p>"Companies in your industry typically offer 10% signing bonuses – include this in your counteroffer!"</p>
+                  </div>
                 </div>
               ) : (
                 <div className="animate-fade-in">
@@ -221,7 +234,7 @@ const SalaryAnalysis = () => {
                   </div>
                   
                   <button className="w-full mt-6 py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 text-sm">
-                    View Full Report
+                    Download Negotiation Report
                   </button>
                 </div>
               )}

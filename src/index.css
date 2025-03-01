@@ -93,11 +93,9 @@
   }
 
   .cta-button {
-    @apply relative overflow-hidden bg-gradient-to-r from-primary to-cyan text-white font-semibold py-3 px-6 rounded-lg shadow-lg
+    @apply relative overflow-hidden bg-[#008CFF] text-white font-semibold py-3 px-6 rounded-lg shadow-lg
     transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
-    before:absolute before:content-[''] before:top-0 before:right-0 before:bottom-0 before:left-0
-    before:bg-gradient-to-r before:from-cyan before:to-primary before:opacity-0 before:transition-opacity
-    before:duration-300 hover:before:opacity-100 hover:shadow-[0_0_20px_rgba(0,212,255,0.5)];
+    hover:shadow-[0_0_25px_rgba(0,140,255,0.6)];
   }
 
   .nav-link {
@@ -121,3 +119,4 @@
     background-size: 40px 40px;
   }
 }
+

@@ -53,7 +53,7 @@ const Hero = () => {
         </div>
         
         <h1 className="text-gradient text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-          Negotiate Your Salary With Confidence
+          Get the Salary You Deserve – AI-Powered Salary Negotiation for Job Offers
         </h1>
         
         <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-12">
@@ -61,13 +61,20 @@ const Hero = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-          <a href="#analyze" className="cta-button group">
+          <a 
+            href="#analyze" 
+            className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
+            transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
+            bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
+          >
             Analyze My Offer
             <ArrowRight className="inline-block ml-2 group-hover:translate-x-1 transition-transform duration-300" size={18} />
           </a>
-          <a href="#features" className="py-3 px-6 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300">
-            See How It Works
-          </a>
+          <div className="flex items-center text-xs text-white/60 mt-2 sm:mt-0 justify-center">
+            <a href="#privacy" className="hover:text-white mr-3 transition-colors">Privacy Policy</a>
+            <span className="mx-2">•</span>
+            <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
+          </div>
         </div>
         
         <div className="flex justify-center">

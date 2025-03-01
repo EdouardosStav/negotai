@@ -15,12 +15,7 @@ const Footer = () => {
           {/* Column 1 - Brand */}
           <div>
             <div className="flex items-center mb-6">
-              <img 
-                src="/lovable-uploads/99419d5b-f5a2-486a-b3a2-fb21fbd94693.png" 
-                alt="NegotAI Logo" 
-                className="h-8 w-auto"
-              />
-              <span className="ml-2 text-lg font-bold text-white">NegotAI</span>
+              <span className="text-lg font-bold text-white">NegotAI</span>
             </div>
             <p className="text-white/70 text-sm mb-6">
               AI-powered salary insights and negotiation strategies tailored to your skills and experience.
@@ -35,7 +30,7 @@ const Footer = () => {
               <a href="#" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all">
                 <Github size={16} className="text-white" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all">
+              <a href="mailto:support@negotiai.com" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all">
                 <Mail size={16} className="text-white" />
               </a>
             </div>
@@ -56,6 +51,9 @@ const Footer = () => {
               </li>
               <li>
                 <a href="#" className="text-white/70 hover:text-white transition-colors">Press</a>
+              </li>
+              <li>
+                <a href="mailto:support@negotiai.com" className="text-white/70 hover:text-white transition-colors">Contact Us</a>
               </li>
             </ul>
           </div>
@@ -84,10 +82,10 @@ const Footer = () => {
             <h3 className="text-white font-bold mb-4">Legal</h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-colors">Terms of Service</a>
+                <a href="#terms" className="text-white/70 hover:text-white transition-colors">Terms of Service</a>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#privacy" className="text-white/70 hover:text-white transition-colors">Privacy Policy</a>
               </li>
               <li>
                 <a href="#" className="text-white/70 hover:text-white transition-colors">Cookie Policy</a>

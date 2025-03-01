@@ -25,12 +25,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/99419d5b-f5a2-486a-b3a2-fb21fbd94693.png" 
-              alt="NegotAI Logo" 
-              className="h-10 w-auto"
-            />
-            <span className="ml-2 text-xl font-bold text-white">NegotAI</span>
+            <span className="text-xl font-bold text-white">NegotAI</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -45,12 +40,6 @@ const Navbar = () => {
               className="text-white hover:text-cyan transition-colors duration-300"
             >
               Sign In
-            </a>
-            <a 
-              href="#analyze" 
-              className="cta-button"
-            >
-              Analyze My Offer
             </a>
           </nav>
 
@@ -107,13 +96,6 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Sign In
-            </a>
-            <a 
-              href="#analyze" 
-              className="cta-button mt-2 w-full text-center"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Analyze My Offer
             </a>
           </nav>
         )}

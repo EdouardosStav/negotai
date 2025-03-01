@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, User, DollarSign, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, User, DollarSign, Star, ShieldCheck } from "lucide-react";
 
 const testimonials = [
   {
@@ -10,7 +10,8 @@ const testimonials = [
     content: "NegotAI helped me land a $25K higher salary than initially offered. The AI-generated talking points gave me the confidence to negotiate effectively.",
     increase: 25000,
     rating: 5,
-    industry: "Tech"
+    industry: "Tech",
+    verified: true
   },
   {
     id: 2,
@@ -19,7 +20,8 @@ const testimonials = [
     content: "I was about to accept the first offer until NegotAI showed me I was being underpaid by 15%. Used their strategy and got a significant bump plus better benefits.",
     increase: 18500,
     rating: 5,
-    industry: "Software"
+    industry: "Software",
+    verified: true
   },
   {
     id: 3,
@@ -28,7 +30,8 @@ const testimonials = [
     content: "The salary insights were spot-on for my industry and location. NegotAI's negotiation script helped me secure not just more pay, but also additional stock options.",
     increase: 32000,
     rating: 5,
-    industry: "Marketing"
+    industry: "Marketing",
+    verified: true
   },
   {
     id: 4,
@@ -37,7 +40,8 @@ const testimonials = [
     content: "As someone who hates negotiating, this tool was a lifesaver. The personalized counter-offer strategy worked perfectly and I got $15K more than the initial offer.",
     increase: 15000,
     rating: 4,
-    industry: "Finance"
+    industry: "Finance",
+    verified: false
   },
 ];
 
@@ -111,8 +115,8 @@ const Testimonials = () => {
             </div>
             
             <div className="glass-card p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-gradient mb-2">${(calculateTotalIncrease() / 1000000).toFixed(1)}M+</div>
-              <p className="text-white/70 text-sm">Total Salary Increases</p>
+              <div className="text-3xl font-bold text-gradient mb-2">Over $100,000</div>
+              <p className="text-white/70 text-sm">in Salary Gains for Our Users!</p>
             </div>
             
             <div className="glass-card p-6 rounded-xl text-center">
@@ -145,7 +149,15 @@ const Testimonials = () => {
                               />
                             ))}
                           </div>
-                          <h3 className="text-xl font-bold text-white mb-1">{testimonial.name}</h3>
+                          <div className="flex items-center">
+                            <h3 className="text-xl font-bold text-white mb-1">{testimonial.name}</h3>
+                            {testimonial.verified && (
+                              <div className="ml-2 flex items-center text-xs text-premium font-medium">
+                                <ShieldCheck size={14} className="mr-1" />
+                                <span>Verified User</span>
+                              </div>
+                            )}
+                          </div>
                           <div className="text-white/60 text-sm mb-4">{testimonial.role} | {testimonial.industry}</div>
                           <p className="text-white/80 mb-6">"{testimonial.content}"</p>
                           <div className="flex items-center px-4 py-3 bg-primary/10 rounded-lg border border-primary/20 w-fit">
