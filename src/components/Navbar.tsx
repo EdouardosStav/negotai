@@ -1,12 +1,15 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "react-router-dom";
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFeatureDropdownOpen, setIsFeatureDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -25,11 +28,13 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const handleSignIn = () => {
     console.log("User clicked Sign In - would open auth modal");
     // For a real implementation, this would open the auth modal
     // or redirect to a sign-in page
   };
+
   const scrollToSection = (sectionId: string) => {
     // Check if we're on the home page
     if (window.location.pathname !== '/') {
@@ -37,6 +42,7 @@ const Navbar = () => {
       window.location.href = `/#${sectionId}`;
       return;
     }
+    
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({
@@ -46,9 +52,11 @@ const Navbar = () => {
       setIsFeatureDropdownOpen(false);
     }
   };
+
   const toggleFeatureDropdown = () => {
     setIsFeatureDropdownOpen(!isFeatureDropdownOpen);
   };
+
   return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-3 bg-navy-dark/80 backdrop-blur-lg shadow-lg" : "py-5 bg-transparent"}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
@@ -71,7 +79,13 @@ const Navbar = () => {
             
             {/* Features Dropdown */}
             <div className="relative" ref={dropdownRef}>
-              
+              <button 
+                className="nav-link flex items-center"
+                onClick={toggleFeatureDropdown}
+                onMouseEnter={() => setIsFeatureDropdownOpen(true)}
+              >
+                Features <ChevronDown size={16} className="ml-1" />
+              </button>
               
               {isFeatureDropdownOpen && <div className="absolute top-full left-0 mt-1 py-2 w-48 bg-navy-dark/90 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg z-50 animate-fade-in" onMouseLeave={() => setIsFeatureDropdownOpen(false)}>
                   <a href="#analyze" className="block px-4 py-2 text-white hover:bg-white/10 transition-colors" onClick={e => {
@@ -164,4 +178,5 @@ const Navbar = () => {
       </div>
     </header>;
 };
+
 export default Navbar;
