@@ -1,17 +1,14 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "react-router-dom";
 import ContactModal from "./ContactModal";
-
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFeatureDropdownOpen, setIsFeatureDropdownOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -30,13 +27,11 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const handleSignIn = () => {
     console.log("User clicked Sign In - would open auth modal");
     // For a real implementation, this would open the auth modal
     // or redirect to a sign-in page
   };
-
   const scrollToSection = (sectionId: string) => {
     // Check if we're on the home page
     if (window.location.pathname !== '/') {
@@ -44,7 +39,6 @@ const Navbar = () => {
       window.location.href = `/#${sectionId}`;
       return;
     }
-    
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({
@@ -54,18 +48,14 @@ const Navbar = () => {
       setIsFeatureDropdownOpen(false);
     }
   };
-
   const toggleFeatureDropdown = () => {
     setIsFeatureDropdownOpen(!isFeatureDropdownOpen);
   };
-
   const openContactModal = () => {
     setIsContactModalOpen(true);
     setIsMobileMenuOpen(false);
   };
-
-  return (
-    <>
+  return <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-3 bg-navy-dark/80 backdrop-blur-lg shadow-lg" : "py-5 bg-transparent"}`}>
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
@@ -88,11 +78,7 @@ const Navbar = () => {
               
               {/* Features Dropdown */}
               <div className="relative" ref={dropdownRef}>
-                <button 
-                  className="nav-link flex items-center"
-                  onClick={toggleFeatureDropdown}
-                  onMouseEnter={() => setIsFeatureDropdownOpen(true)}
-                >
+                <button className="nav-link flex items-center" onClick={toggleFeatureDropdown} onMouseEnter={() => setIsFeatureDropdownOpen(true)}>
                   Features <ChevronDown size={16} className="ml-1" />
                 </button>
                 
@@ -104,7 +90,7 @@ const Navbar = () => {
                       Salary Analysis
                     </a>
                     <div className="flex items-center px-4 py-2 text-white/70 hover:bg-white/10 transition-colors">
-                      <span>AI Negotiation Chat</span>
+                      <span className="px-0 mx-[5px]">AI Negotiation Chat</span>
                       <span className="ml-2 text-xs text-cyan/60 font-medium">Coming Soon!</span>
                     </div>
                   </div>}
@@ -189,12 +175,7 @@ const Navbar = () => {
       </header>
       
       {/* Contact Modal */}
-      <ContactModal 
-        isOpen={isContactModalOpen} 
-        onClose={() => setIsContactModalOpen(false)} 
-      />
-    </>
-  );
+      <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
+    </>;
 };
-
 export default Navbar;
