@@ -57,7 +57,7 @@ const Hero = () => {
           </span>
         </div>
         
-        <h1 className="text-gradient md:text-5xl lg:text-6xl font-bold mb-6 leading-[1.2] tracking-normal text-6xl text-center">
+        <h1 className="text-gradient md:text-5xl lg:text-6xl font-bold mb-6 leading-[1.2] tracking-normal text-6xl text-center py-[2px]">
           Get the Salary You Deserve – AI-Powered Salary Negotiation for Job Offers
         </h1>
         
