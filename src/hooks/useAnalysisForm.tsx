@@ -1,127 +1,188 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { SalaryAnalysisInput, saveSalaryAnalysis } from "@/services/analysisService";
 import { toast } from "sonner";
+import { SalaryAnalysisInput, analyzeSalaryOffer, saveSalaryAnalysis } from "@/services/analysisService";
 
 export const useAnalysisForm = () => {
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   
+  // Form state
   const [formData, setFormData] = useState<SalaryAnalysisInput>({
     jobTitle: "",
+    companyName: "",
+    jobLevel: "",
+    employmentType: "Full-Time",
     experience: "",
     location: "",
     salary: "",
-    companyName: "",
-    benefitsPackage: "",
-    jobLevel: "",
-    employmentType: "Full-Time"
+    benefitsPackage: ""
   });
   
-  // Static analysis results - won't update until form is submitted
-  const [analysisResults, setAnalysisResults] = useState({
-    fairnessScore: 80,
-    suggestedCounteroffer: 0
-  });
+  // Analysis state
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState<{
+    fairnessScore: number;
+    suggestedCounteroffer: number;
+    aiAnalysis?: any;
+  } | null>(null);
   
-  // Static sample data for preview - won't update with form changes
+  // Sample data for the preview panel
   const sampleData = {
+    jobTitle: "Senior Software Engineer",
+    companyName: "TechCorp Inc.",
     jobLevel: "Senior",
-    employmentType: "Full-Time"
+    employmentType: "Full-Time",
+    experience: "6-10",
+    location: "San Francisco, CA",
+    salary: "150000",
+    benefitsPackage: "Health Insurance Premium Plan, 2% Equity, 8% Performance Bonus, Hybrid Work (3 days in office), 15 PTO days"
   };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  
+  // Handle form input changes
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
+  
+  // Load sample data for the preview
+  const handleSampleView = () => {
+    setFormData(sampleData);
+    
+    // Set some example analysis results for the preview
+    setAnalysisResults({
+      fairnessScore: 80,
+      suggestedCounteroffer: 168000,
+      aiAnalysis: {
+        companySpecific: {
+          text: "Your offer is 75% above average for Senior Software Engineer roles at TechCorp Inc.",
+          percentage: "75% above average"
+        },
+        marketComparison: {
+          text: "Your offer is 70% above industry average for Senior Software Engineer roles in San Francisco, CA",
+          percentage: "70% above average"
+        },
+        benefitsAssessment: {
+          text: "Your benefits package is At Industry Standard. Your equity offer (2%) is competitive, but your PTO (15 days) is below the average of 20 days for your level.",
+          rating: "At Industry Standard"
+        },
+        bonusAndEquity: {
+          text: "Your 8% performance bonus is slightly below the 10% industry average for Senior roles."
+        },
+        growthPotential: {
+          text: "Salary growth trajectory aligns with industry standards for Full-Time positions"
+        },
+        negotiationPoints: [
+          "Request 20 PTO days (industry standard is 20-25 days)",
+          "Negotiate for 10% performance bonus (currently 8%)",
+          "Ask about professional development budget",
+          "Inquire about remote work flexibility"
+        ]
+      }
+    });
+    
+    setFormSubmitted(true);
+  };
+  
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!formData.jobTitle || !formData.location || !formData.salary || !formData.experience) {
-      toast.error("Please fill in all required fields");
+    if (!isAuthenticated) {
+      toast.error("Please sign in to analyze your offer");
+      navigate("/auth");
       return;
     }
     
     try {
       setIsAnalyzing(true);
       
-      // Calculate suggested counteroffer (12% increase)
-      const salary = typeof formData.salary === 'string' ? parseFloat(formData.salary) : formData.salary;
-      const suggestedCounteroffer = Math.round(salary * 1.12);
+      // Convert salary to a number
+      const numericSalary = parseFloat(formData.salary.toString());
+      if (isNaN(numericSalary)) {
+        throw new Error("Please enter a valid salary amount");
+      }
       
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call the OpenAI API through our Supabase Edge Function
+      const response = await analyzeSalaryOffer({
+        ...formData,
+        salary: numericSalary
+      }, user?.id || '');
       
+      // Extract the analysis results
+      const { analysis, prompt } = response;
+      
+      // Update state with the analysis results
       setAnalysisResults({
-        fairnessScore: 80, // Mock score
-        suggestedCounteroffer
+        fairnessScore: analysis.fairnessScore || 75,
+        suggestedCounteroffer: analysis.suggestedCounteroffer || Math.round(numericSalary * 1.1),
+        aiAnalysis: analysis
       });
       
-      setFormSubmitted(true);
+      console.log("AI Analysis completed:", analysis);
       
-      // Don't auto-save, let the user decide to save
+      // Update form state
+      setFormSubmitted(true);
+      toast.success("Analysis completed successfully");
     } catch (error) {
-      console.error("Error analyzing offer:", error);
-      toast.error("Failed to analyze offer. Please try again.");
+      console.error("Error analyzing salary offer:", error);
+      toast.error("Failed to analyze your offer. Please try again.");
     } finally {
       setIsAnalyzing(false);
     }
   };
-
-  const handleSampleView = () => {
-    // Use static sample data that doesn't rely on form inputs
-    setFormData({
-      jobTitle: "Software Engineer",
-      experience: "3-5",
-      location: "San Francisco, CA",
-      salary: "120000",
-      companyName: "TechCorp Inc.",
-      benefitsPackage: "Health Insurance Premium Plan, 2% Equity, 8% Performance Bonus, Hybrid Work (3 days in office), 15 PTO days",
-      jobLevel: "Senior",
-      employmentType: "Full-Time"
-    });
-    
-    setAnalysisResults({
-      fairnessScore: 80,
-      suggestedCounteroffer: 134400 // 120000 * 1.12
-    });
-    
-    setFormSubmitted(true);
-  };
-
+  
+  // Save analysis to user's dashboard
   const handleSaveAnalysis = async () => {
-    if (!isAuthenticated) {
-      // Store current analysis data in session storage for after login
-      sessionStorage.setItem('pendingAnalysis', JSON.stringify({
-        formData,
-        analysisResults
-      }));
-      
-      // Redirect to auth with return path
-      navigate("/auth?redirect=analyze");
+    if (!isAuthenticated || !user) {
+      toast.error("Please sign in to save your analysis");
       return;
     }
     
-    if (!user) {
-      toast.error("User authentication error. Please try logging in again.");
+    if (!analysisResults) {
+      toast.error("No analysis results to save");
       return;
     }
     
     try {
       setIsSaving(true);
-      await saveSalaryAnalysis(user.id, formData, analysisResults);
-      toast.success("Analysis saved successfully to your dashboard");
-      navigate("/dashboard");
+      
+      // Save the analysis to the database
+      const savedAnalysis = await saveSalaryAnalysis(
+        user.id,
+        {
+          ...formData,
+          salary: parseFloat(formData.salary.toString())
+        },
+        {
+          fairnessScore: analysisResults.fairnessScore,
+          suggestedCounteroffer: analysisResults.suggestedCounteroffer
+        }
+      );
+      
+      // Update the analysis with AI results
+      if (savedAnalysis && analysisResults.aiAnalysis) {
+        await supabase
+          .from('salary_analyses')
+          .update({
+            ai_analysis: analysisResults.aiAnalysis,
+            analysis_prompt: formData.jobTitle + " " + formData.location
+          })
+          .eq('id', savedAnalysis.id);
+      }
+      
+      toast.success("Analysis saved to your dashboard");
+      
+      // Wait a moment before redirecting
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
     } catch (error) {
       console.error("Error saving analysis:", error);
       toast.error("Failed to save analysis. Please try again.");
@@ -129,39 +190,13 @@ export const useAnalysisForm = () => {
       setIsSaving(false);
     }
   };
-
+  
+  // Redirect to auth page for non-authenticated users
   const redirectToAuth = () => {
-    // Store current analysis data in session storage for after login
-    sessionStorage.setItem('pendingAnalysis', JSON.stringify({
-      formData,
-      analysisResults
-    }));
-    
-    // Redirect to auth with return path
-    navigate("/auth?redirect=analyze");
+    toast.info("Please sign in to save your analysis");
+    navigate("/auth");
   };
-
-  // Check for pending analysis after authentication
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const pendingAnalysis = sessionStorage.getItem('pendingAnalysis');
-      if (pendingAnalysis) {
-        try {
-          const parsedData = JSON.parse(pendingAnalysis);
-          setFormData(parsedData.formData);
-          setAnalysisResults(parsedData.analysisResults);
-          setFormSubmitted(true);
-          sessionStorage.removeItem('pendingAnalysis');
-          
-          // Show toast
-          toast.info("Analysis restored. You can now save it to your account.");
-        } catch (error) {
-          console.error("Error restoring pending analysis:", error);
-        }
-      }
-    }
-  }, [isAuthenticated, user, navigate]);
-
+  
   return {
     formData,
     formSubmitted,

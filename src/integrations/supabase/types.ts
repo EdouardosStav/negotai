@@ -44,6 +44,8 @@ export type Database = {
       }
       salary_analyses: {
         Row: {
+          ai_analysis: Json | null
+          analysis_prompt: string | null
           benefits_package: string | null
           company_name: string | null
           created_at: string | null
@@ -62,6 +64,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ai_analysis?: Json | null
+          analysis_prompt?: string | null
           benefits_package?: string | null
           company_name?: string | null
           created_at?: string | null
@@ -80,6 +84,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ai_analysis?: Json | null
+          analysis_prompt?: string | null
           benefits_package?: string | null
           company_name?: string | null
           created_at?: string | null

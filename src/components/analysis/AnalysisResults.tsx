@@ -14,6 +14,7 @@ interface AnalysisResultsProps {
   analysisResults?: {
     fairnessScore: number;
     suggestedCounteroffer: number;
+    aiAnalysis?: any;
   };
   handleSaveAnalysis?: () => void;
   redirectToAuth?: () => void;
@@ -43,9 +44,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const benefitsPackage = formData?.benefitsPackage || analysis?.benefits_package || '';
   
   // Determine scores based on which props are passed
-  const fairnessScore = analysisResults?.fairnessScore || 80;
+  const fairnessScore = analysisResults?.fairnessScore || analysis?.fairness_score || 80;
   const suggestedCounteroffer = analysisResults?.suggestedCounteroffer || 
     (analysis ? Math.round(analysis.offered_salary * 1.12) : 0);
+  
+  // Get AI analysis data
+  const aiAnalysis = analysisResults?.aiAnalysis || analysis?.ai_analysis || null;
 
   return (
     <div className="animate-fade-in">
@@ -68,7 +72,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           ></div>
         </div>
         <p className="text-white/70 text-xs mt-2">
-          Your offer is well above market value considering your job level and benefits package.
+          {aiAnalysis?.marketComparison?.text || 
+           "Your offer is well above market value considering your job level and benefits package."}
         </p>
       </div>
       
@@ -78,7 +83,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             <Building className="text-cyan mt-1 flex-shrink-0" size={18} />
             <p className="text-white/80 text-sm">
               <span className="font-medium text-white block mb-1">Company Specific</span>
-              Your offer is 75% above average for {jobLevel} {jobTitle} roles at {companyName}
+              {aiAnalysis?.companySpecific?.text || 
+               `Your offer is 75% above average for ${jobLevel} ${jobTitle} roles at ${companyName}`}
             </p>
           </div>
         )}
@@ -87,16 +93,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <CheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
           <p className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Competitive Base Salary</span>
-            Your offer is 70% above industry average for {jobLevel} {jobTitle} roles in {location}
+            {aiAnalysis?.marketComparison?.text || 
+             `Your offer is 70% above industry average for ${jobLevel} ${jobTitle} roles in ${location}`}
           </p>
         </div>
         
-        {benefitsPackage && (
+        {(benefitsPackage || aiAnalysis?.benefitsAssessment) && (
           <div className="flex items-start gap-3">
             <Gift className="text-amber-400 mt-1 flex-shrink-0" size={18} />
             <p className="text-white/80 text-sm">
               <span className="font-medium text-white block mb-1">Benefits Assessment</span>
-              Your benefits package is <span className="text-amber-400 font-medium">At Industry Standard</span>. Your equity offer (2%) is competitive, but your PTO (15 days) is below the average of 20 days for your level.
+              {aiAnalysis?.benefitsAssessment?.text || 
+               `Your benefits package is <span className="text-amber-400 font-medium">At Industry Standard</span>. Your equity offer (2%) is competitive, but your PTO (15 days) is below the average of 20 days for your level.`}
             </p>
           </div>
         )}
@@ -105,7 +113,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <Award className="text-amber-400 mt-1 flex-shrink-0" size={18} />
           <p className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Bonus & Stock Potential</span>
-            Your 8% performance bonus is slightly below the 10% industry average for {jobLevel} roles.
+            {aiAnalysis?.bonusAndEquity?.text || 
+             `Your 8% performance bonus is slightly below the 10% industry average for ${jobLevel} roles.`}
           </p>
         </div>
         
@@ -113,7 +122,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <Clock className="text-success mt-1 flex-shrink-0" size={18} />
           <p className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Growth Potential</span>
-            Salary growth trajectory aligns with industry standards for {employmentType} positions
+            {aiAnalysis?.growthPotential?.text || 
+             `Salary growth trajectory aligns with industry standards for ${employmentType} positions`}
           </p>
         </div>
       </div>
@@ -126,14 +136,23 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           ${suggestedCounteroffer.toLocaleString()}
         </p>
         <p className="text-white/70 text-xs mt-1">
-          12% increase with strong justification based on market data
+          {fairnessScore < 70 ? "Increase recommended with strong justification based on market data" : 
+          "This is a competitive offer, but some increase may be possible"}
         </p>
         <div className="mt-3 pt-3 border-t border-white/10">
           <p className="text-sm text-white mb-2">Additional negotiation points:</p>
           <ul className="text-xs text-white/70 space-y-1">
-            <li>• Request 20 PTO days (industry standard is 20-25 days)</li>
-            <li>• Negotiate for 10% performance bonus (currently 8%)</li>
-            <li>• Ask about professional development budget</li>
+            {aiAnalysis?.negotiationPoints ? (
+              aiAnalysis.negotiationPoints.map((point: string, index: number) => (
+                <li key={index}>• {point}</li>
+              ))
+            ) : (
+              <>
+                <li>• Request 20 PTO days (industry standard is 20-25 days)</li>
+                <li>• Negotiate for 10% performance bonus (currently 8%)</li>
+                <li>• Ask about professional development budget</li>
+              </>
+            )}
           </ul>
         </div>
       </div>
