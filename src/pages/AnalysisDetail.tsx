@@ -4,37 +4,22 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { getSalaryAnalysisById, updateNegotiationStatus } from "@/services/analysisService";
 import { 
-  DollarSign, 
-  Building, 
-  Gift, 
-  Award, 
-  Clock, 
-  MapPin, 
-  Briefcase, 
   ChevronLeft, 
-  Calendar, 
   Loader2,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Pencil,
-  Trash2
+  AlertCircle
 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EditAnalysisModal from "@/components/EditAnalysisModal";
 import DeleteAnalysisModal from "@/components/DeleteAnalysisModal";
 import { Database } from "@/integrations/supabase/client";
+import AnalysisHeader from "@/components/analysis/AnalysisHeader";
+import BasicInfo from "@/components/analysis/BasicInfo";
+import SalaryInfo from "@/components/analysis/SalaryInfo";
+import AnalysisResults from "@/components/analysis/AnalysisResults";
+import BenefitsPackage from "@/components/analysis/BenefitsPackage";
 
 type SalaryAnalysis = Database['public']['Tables']['salary_analyses']['Row'];
 
@@ -160,32 +145,6 @@ const AnalysisDetail = () => {
       </div>
     );
   }
-  
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Offer Accepted':
-        return <CheckCircle2 className="text-success" size={18} />;
-      case 'Negotiation Failed':
-        return <XCircle className="text-destructive" size={18} />;
-      case 'Counteroffer Sent':
-        return <AlertCircle className="text-amber-500" size={18} />;
-      default:
-        return <Clock className="text-white/70" size={18} />;
-    }
-  };
-  
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case 'Offer Accepted':
-        return 'bg-success/20 text-success';
-      case 'Negotiation Failed':
-        return 'bg-destructive/20 text-destructive';
-      case 'Counteroffer Sent':
-        return 'bg-amber-500/20 text-amber-500';
-      default:
-        return 'bg-white/10 text-white/80';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-navy overflow-x-hidden">
@@ -202,176 +161,27 @@ const AnalysisDetail = () => {
           <div className="max-w-4xl mx-auto">
             <div className="glass-card rounded-xl overflow-hidden">
               <div className="p-8 border-b border-white/10">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                  <div>
-                    <h1 className="text-2xl font-bold text-white mb-1">{analysis.job_title}</h1>
-                    {analysis.company_name && (
-                      <div className="flex items-center text-white/70 mb-2">
-                        <Building size={14} className="mr-1" />
-                        {analysis.company_name}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center gap-3 mt-4 md:mt-0">
-                    <div className={`px-4 py-1.5 rounded-full text-sm font-medium flex items-center ${getStatusClass(analysis.negotiation_status)}`}>
-                      {getStatusIcon(analysis.negotiation_status)}
-                      <span className="ml-1.5">{analysis.negotiation_status}</span>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={handleEdit}
-                        className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
-                      >
-                        <Pencil size={16} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={handleDelete}
-                        className="h-8 w-8 text-white/70 hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                <AnalysisHeader 
+                  analysis={analysis} 
+                  onEdit={handleEdit} 
+                  onDelete={handleDelete} 
+                />
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <div className="text-white/60 text-sm">Job Level</div>
-                    <div className="text-white font-medium">{analysis.job_level || "Not specified"}</div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-white/60 text-sm">Employment Type</div>
-                    <div className="text-white font-medium">{analysis.employment_type}</div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-white/60 text-sm">Experience</div>
-                    <div className="text-white font-medium">{analysis.experience} years</div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-white/60 text-sm">Location</div>
-                    <div className="text-white font-medium flex items-center">
-                      <MapPin size={14} className="mr-1" />
-                      {analysis.location}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-white/60 text-sm">Created</div>
-                    <div className="text-white font-medium">
-                      {formatDate(analysis.created_at)}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-white/60 text-sm">Last Updated</div>
-                    <div className="text-white font-medium">
-                      {formatDate(analysis.updated_at)}
-                    </div>
-                  </div>
-                </div>
+                <BasicInfo analysis={analysis} formatDate={formatDate} />
               </div>
               
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  <div className="bg-white/5 p-6 rounded-lg">
-                    <h3 className="text-lg font-semibold text-white mb-4">Salary Information</h3>
-                    <div className="space-y-6">
-                      <div>
-                        <div className="text-white/60 text-sm mb-1">Offered Salary</div>
-                        <div className="text-white text-2xl font-bold">
-                          {formatCurrency(analysis.offered_salary)}
-                        </div>
-                      </div>
-                      
-                      {analysis.suggested_counteroffer && (
-                        <div>
-                          <div className="text-white/60 text-sm mb-1">Suggested Counteroffer</div>
-                          <div className="text-gradient text-2xl font-bold">
-                            {formatCurrency(analysis.suggested_counteroffer)}
-                          </div>
-                          <div className="text-white/60 text-xs mt-1">
-                            {Math.round((analysis.suggested_counteroffer / analysis.offered_salary - 1) * 100)}% increase
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <SalaryInfo analysis={analysis} formatCurrency={formatCurrency} />
                   
-                  <div className="bg-white/5 p-6 rounded-lg">
-                    <h3 className="text-lg font-semibold text-white mb-4">Analysis Results</h3>
-                    
-                    {analysis.fairness_score !== null && (
-                      <div className="mb-6">
-                        <div className="flex justify-between mb-2">
-                          <span className="text-white/70">Fairness Score</span>
-                          <span className={`font-medium ${
-                            analysis.fairness_score >= 70 ? 'text-success' :
-                            analysis.fairness_score >= 40 ? 'text-amber-400' :
-                            'text-destructive'
-                          }`}>
-                            {analysis.fairness_score}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-white/10 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full ${
-                              analysis.fairness_score >= 70 ? 'bg-gradient-to-r from-success/80 to-success' :
-                              analysis.fairness_score >= 40 ? 'bg-gradient-to-r from-amber-500/80 to-amber-500' :
-                              'bg-gradient-to-r from-destructive/80 to-destructive'
-                            }`}
-                            style={{ width: `${analysis.fairness_score}%` }}
-                          ></div>
-                        </div>
-                        <div className="text-white/60 text-xs mt-2">
-                          {analysis.fairness_score >= 70 
-                            ? "Your offer is above market value. Strong position for acceptance." 
-                            : analysis.fairness_score >= 40 
-                              ? "Your offer is near market value. Consider negotiating key points."
-                              : "Your offer is below market value. Strong position for negotiation."}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <div className="text-white/60 text-sm mb-2">Negotiation Status:</div>
-                      <Select 
-                        value={analysis.negotiation_status} 
-                        onValueChange={handleStatusChange}
-                        disabled={isUpdatingStatus}
-                      >
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
-                          <SelectValue placeholder="Update status" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-navy-dark border-white/10">
-                          <SelectItem value="Awaiting Response">Awaiting Response</SelectItem>
-                          <SelectItem value="Counteroffer Sent">Counteroffer Sent</SelectItem>
-                          <SelectItem value="Offer Accepted">Offer Accepted</SelectItem>
-                          <SelectItem value="Negotiation Failed">Negotiation Failed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                  <AnalysisResults 
+                    analysis={analysis} 
+                    isUpdatingStatus={isUpdatingStatus} 
+                    onStatusChange={handleStatusChange} 
+                  />
                 </div>
                 
-                {analysis.benefits_package && (
-                  <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-white mb-4">Benefits Package</h3>
-                    <div className="bg-white/5 p-6 rounded-lg">
-                      <div className="text-white/80 whitespace-pre-wrap">
-                        {analysis.benefits_package}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <BenefitsPackage benefitsPackage={analysis.benefits_package} />
                 
                 <div className="text-center mt-10">
                   <Button 
