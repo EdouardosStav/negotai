@@ -1,6 +1,7 @@
 
 import { ArrowRight, ChartBar, DollarSign, Briefcase } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Features = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -29,6 +30,15 @@ const Features = () => {
       }
     };
   }, []);
+
+  const handleStepClick = (stepId: string) => {
+    // Scroll to the analyze section when clicking on a feature step
+    const analyzeSection = document.getElementById('analyze');
+    if (analyzeSection) {
+      analyzeSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    console.log(`User clicked on step ${stepId}`);
+  };
 
   return (
     <section 
@@ -62,10 +72,22 @@ const Features = () => {
               Enter your job details, experience level, location, and the salary offer you've received.
             </p>
             <div className="pt-2">
-              <span className="text-cyan text-sm font-medium inline-flex items-center group cursor-pointer">
-                Input your offer details 
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" size={14} />
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      onClick={() => handleStepClick('step1')} 
+                      className="text-cyan text-sm font-medium inline-flex items-center group cursor-pointer"
+                    >
+                      Input your offer details 
+                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" size={14} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+                    <p>Try out our salary analysis tool</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
           
@@ -82,10 +104,22 @@ const Features = () => {
               Our AI analyzes market data, industry standards, and location-specific factors to evaluate your offer's fairness.
             </p>
             <div className="pt-2">
-              <span className="text-cyan text-sm font-medium inline-flex items-center group cursor-pointer">
-                How our AI works 
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" size={14} />
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      onClick={() => handleStepClick('step2')} 
+                      className="text-cyan text-sm font-medium inline-flex items-center group cursor-pointer"
+                    >
+                      How our AI works 
+                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" size={14} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+                    <p>See a sample analysis</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
           
@@ -102,10 +136,22 @@ const Features = () => {
               Receive personalized negotiation strategies, talking points, and suggested counter-offers based on your specific situation.
             </p>
             <div className="pt-2">
-              <span className="text-cyan text-sm font-medium inline-flex items-center group cursor-pointer">
-                View sample insights 
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" size={14} />
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      onClick={() => handleStepClick('step3')} 
+                      className="text-cyan text-sm font-medium inline-flex items-center group cursor-pointer"
+                    >
+                      View sample insights 
+                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" size={14} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+                    <p>Sign in to get personalized insights</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>

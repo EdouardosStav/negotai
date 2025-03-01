@@ -1,9 +1,13 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -29,6 +33,20 @@ const Hero = () => {
       }
     };
   }, []);
+
+  const handleAnalyzeClick = () => {
+    // For now, we just scroll to the analyze section
+    // Later, this will handle auth flow
+    const analyzeSection = document.getElementById('analyze');
+    if (analyzeSection) {
+      analyzeSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // In a real implementation, we would check auth state here
+    // and show the auth modal if needed
+    // For now, we'll just simulate this with a console log
+    console.log("User clicked Analyze My Offer - would check auth state here");
+  };
 
   return (
     <section 
@@ -61,15 +79,25 @@ const Hero = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-          <a 
-            href="#analyze" 
-            className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
-            transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
-            bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
-          >
-            Analyze My Offer
-            <ArrowRight className="inline-block ml-2 group-hover:translate-x-1 transition-transform duration-300" size={18} />
-          </a>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a 
+                  href="#analyze" 
+                  onClick={handleAnalyzeClick}
+                  className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
+                  transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
+                  bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
+                >
+                  Analyze My Offer
+                  <ArrowRight className="inline-block ml-2 group-hover:translate-x-1 transition-transform duration-300" size={18} />
+                </a>
+              </TooltipTrigger>
+              <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+                <p>Sign in to unlock AI-powered salary analysis</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         
         <div className="flex justify-center">

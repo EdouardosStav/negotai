@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,6 +14,12 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSignIn = () => {
+    console.log("User clicked Sign In - would open auth modal");
+    // For a real implementation, this would open the auth modal
+    // or redirect to a sign-in page
+  };
 
   return (
     <header
@@ -35,12 +42,21 @@ const Navbar = () => {
             <a href="#pricing" className="nav-link">Pricing</a>
             <a href="#about" className="nav-link">About</a>
             <a href="#contact" className="nav-link">Contact</a>
-            <a 
-              href="#signin" 
-              className="text-white hover:text-cyan transition-colors duration-300"
-            >
-              Sign In
-            </a>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleSignIn}
+                    className="text-white hover:text-cyan transition-colors duration-300"
+                  >
+                    Sign In
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+                  <p>Sign in to access your account</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -90,13 +106,12 @@ const Navbar = () => {
             >
               Contact
             </a>
-            <a 
-              href="#signin" 
+            <button 
+              onClick={handleSignIn}
               className="text-white hover:text-cyan transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
             >
               Sign In
-            </a>
+            </button>
           </nav>
         )}
       </div>

@@ -1,6 +1,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { CheckCircle, AlertCircle, DollarSign, ShieldCheck } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const SalaryAnalysis = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -45,7 +51,21 @@ const SalaryAnalysis = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would send this data to your backend
+    // In the pre-auth experience, we simulate the form submission
+    // But would prompt for sign in before showing full results
+    console.log("Form submitted, would require auth before showing full results");
+    setFormSubmitted(true);
+  };
+
+  const handleSampleView = () => {
+    // Pre-fill the form with sample data for the demo
+    setFormData({
+      jobTitle: "Software Engineer",
+      experience: "3-5",
+      location: "San Francisco, CA",
+      salary: "120000",
+    });
+    // Show sample results
     setFormSubmitted(true);
   };
 
@@ -146,14 +166,23 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  <button 
-                    type="submit"
-                    className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
-                    w-full transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
-                    bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
-                  >
-                    Analyze My Offer
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button 
+                          type="submit"
+                          className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
+                          w-full transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
+                          bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
+                        >
+                          Analyze My Offer
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+                        <p>Sign in to unlock AI-powered salary analysis</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </form>
               
@@ -183,10 +212,22 @@ const SalaryAnalysis = () => {
                       <p className="py-1.5 px-2 bg-white/5 rounded-md">Companies in your industry typically offer 10% signing bonuses – include this in your counteroffer!</p>
                     </div>
                   </div>
+                  
+                  <button 
+                    onClick={handleSampleView}
+                    className="mt-6 py-2 px-4 bg-white/10 rounded-lg text-white hover:bg-white/15 transition-all duration-300 text-sm flex items-center"
+                  >
+                    View Sample Analysis
+                  </button>
                 </div>
               ) : (
                 <div className="animate-fade-in">
-                  <h3 className="text-xl font-bold text-white mb-6">Offer Analysis</h3>
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl font-bold text-white">Offer Analysis</h3>
+                    <div className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium text-white/80">
+                      Sample Preview
+                    </div>
+                  </div>
                   
                   <div className="mb-8">
                     <div className="flex justify-between mb-2">
@@ -229,16 +270,25 @@ const SalaryAnalysis = () => {
                       <span className="font-medium text-white">Suggested Counter-Offer:</span>
                     </p>
                     <p className="text-2xl font-bold text-gradient">
-                      ${(parseInt(formData.salary) * 1.12).toLocaleString()}
+                      ${formData.salary ? (parseInt(formData.salary) * 1.12).toLocaleString() : "0"}
                     </p>
                     <p className="text-white/70 text-xs mt-1">
                       12% increase with strong justification based on market data
                     </p>
                   </div>
                   
-                  <button className="w-full mt-6 py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 text-sm">
-                    Download Negotiation Report
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="w-full mt-6 py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 text-sm">
+                          Sign in for Full Analysis & Report
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+                        <p>Sign in to access your personalized report</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               )}
             </div>
