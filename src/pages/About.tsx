@@ -1,16 +1,14 @@
-
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useEffect } from "react";
-
 const About = () => {
   useEffect(() => {
     // Update page title
     document.title = "About - NegotAI";
-    
+
     // Scroll to top on page load
     window.scrollTo(0, 0);
-    
+
     // Add CSS to improve text rendering
     const style = document.createElement('style');
     style.textContent = `
@@ -26,20 +24,18 @@ const About = () => {
       }
     `;
     document.head.appendChild(style);
-    
+
     // Clean up
     return () => {
       document.head.removeChild(style);
     };
   }, []);
-
-  return (
-    <div className="min-h-screen bg-navy overflow-x-hidden">
+  return <div className="min-h-screen bg-navy overflow-x-hidden">
       <Navbar />
       
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4">
-          <h1 className="section-heading text-center mb-6">About NegotAI</h1>
+          <h1 className="section-heading text-center mb-6 py-[7px]">About NegotAI</h1>
           <p className="section-subheading text-center mb-16">
             Empowering professionals to get the salary they deserve
           </p>
@@ -99,8 +95,6 @@ const About = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default About;
