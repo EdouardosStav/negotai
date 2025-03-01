@@ -1,24 +1,20 @@
-
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useEffect } from "react";
-
 const Pricing = () => {
   useEffect(() => {
     // Update page title
     document.title = "Pricing - NegotAI";
-    
+
     // Scroll to top on page load
     window.scrollTo(0, 0);
   }, []);
-
-  return (
-    <div className="min-h-screen bg-navy overflow-x-hidden">
+  return <div className="min-h-screen bg-navy overflow-x-hidden">
       <Navbar />
       
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4">
-          <h1 className="section-heading text-center mb-6">Pricing Plans</h1>
+          <h1 className="section-heading text-center mb-6 py-[7px]">Pricing Plans</h1>
           <p className="section-subheading text-center mb-16">
             Choose the plan that fits your needs
           </p>
@@ -176,8 +172,6 @@ const Pricing = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Pricing;
