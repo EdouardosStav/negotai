@@ -47,6 +47,7 @@ export type Database = {
           benefits_package: string | null
           company_name: string | null
           created_at: string | null
+          deleted_at: string | null
           employment_type: string
           experience: string
           fairness_score: number | null
@@ -64,6 +65,7 @@ export type Database = {
           benefits_package?: string | null
           company_name?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           employment_type: string
           experience: string
           fairness_score?: number | null
@@ -81,6 +83,7 @@ export type Database = {
           benefits_package?: string | null
           company_name?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           employment_type?: string
           experience?: string
           fairness_score?: number | null

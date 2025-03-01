@@ -1,7 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -15,10 +15,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ChevronRight, ClipboardCheck, User, BriefcaseIcon, MapPinIcon, GraduationCapIcon, BarChart4, Calendar, Loader2 } from "lucide-react";
+import { 
+  ChevronRight, 
+  ClipboardCheck, 
+  User, 
+  BriefcaseIcon, 
+  MapPinIcon, 
+  GraduationCapIcon, 
+  BarChart4, 
+  Calendar, 
+  Loader2, 
+  Pencil, 
+  Trash2, 
+  PlusCircle 
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Database } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
+import EditAnalysisModal from "@/components/EditAnalysisModal";
+import DeleteAnalysisModal from "@/components/DeleteAnalysisModal";
+import { getUserAnalyses, updateNegotiationStatus } from "@/services/analysisService";
 
 type SalaryAnalysis = Database['public']['Tables']['salary_analyses']['Row'];
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -33,6 +50,11 @@ const Dashboard = () => {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<string | null>(null);
+  
+  // New state for edit/delete modals
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<SalaryAnalysis | null>(null);
 
   // Fetch user profile and analyses
   useEffect(() => {
@@ -63,14 +85,9 @@ const Dashboard = () => {
 
     const fetchAnalyses = async () => {
       try {
-        const { data, error } = await supabase
-          .from('salary_analyses')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setAnalyses(data || []);
+        setIsLoadingAnalyses(true);
+        const data = await getUserAnalyses(user.id);
+        setAnalyses(data);
       } catch (error) {
         console.error('Error fetching analyses:', error);
         toast.error('Failed to load salary analyses');
@@ -111,28 +128,19 @@ const Dashboard = () => {
     }
   };
 
-  const updateNegotiationStatus = async (analysisId: string, status: string) => {
+  const handleStatusUpdate = async (analysisId: string, status: string) => {
     if (!user) return;
     
     try {
       setIsUpdatingStatus(true);
       setSelectedAnalysisId(analysisId);
       
-      const { error } = await supabase
-        .from('salary_analyses')
-        .update({
-          negotiation_status: status,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', analysisId)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const updatedAnalysis = await updateNegotiationStatus(analysisId, user.id, status);
       
       // Update local state
       setAnalyses(analyses.map(analysis => 
         analysis.id === analysisId 
-          ? { ...analysis, negotiation_status: status } 
+          ? updatedAnalysis 
           : analysis
       ));
       
@@ -168,6 +176,47 @@ const Dashboard = () => {
     }).format(value);
   };
 
+  // Open edit modal for a specific analysis
+  const handleEditAnalysis = (analysis: SalaryAnalysis) => {
+    setSelectedAnalysis(analysis);
+    setEditModalOpen(true);
+  };
+  
+  // Open delete modal for a specific analysis
+  const handleDeleteAnalysis = (analysis: SalaryAnalysis) => {
+    setSelectedAnalysis(analysis);
+    setDeleteModalOpen(true);
+  };
+  
+  // Handle successful edit
+  const handleEditSuccess = (updatedAnalysis: SalaryAnalysis) => {
+    setAnalyses(analyses.map(analysis => 
+      analysis.id === updatedAnalysis.id 
+        ? updatedAnalysis 
+        : analysis
+    ));
+  };
+  
+  // Handle successful delete
+  const handleDeleteSuccess = (analysisId: string) => {
+    setAnalyses(analyses.filter(analysis => analysis.id !== analysisId));
+  };
+  
+  // Handle create new analysis click
+  const handleCreateNewAnalysis = () => {
+    if (window.location.pathname === '/') {
+      // If on home page, scroll to analysis section
+      const analysisSection = document.getElementById('analyze');
+      if (analysisSection) {
+        analysisSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // If not on home page, navigate to home and set flag to scroll
+      sessionStorage.setItem('scrollToAnalysis', 'true');
+      navigate('/#analyze');
+    }
+  };
+
   if (authLoading || isLoadingProfile) {
     return (
       <div className="min-h-screen bg-navy flex items-center justify-center">
@@ -196,9 +245,10 @@ const Dashboard = () => {
             <TabsContent value="analyses">
               <div className="mb-6">
                 <Button 
-                  onClick={() => navigate('/#analyze')} 
+                  onClick={handleCreateNewAnalysis} 
                   className="bg-cyan hover:bg-cyan/80 text-white"
                 >
+                  <PlusCircle size={16} className="mr-1" />
                   Create New Analysis
                 </Button>
               </div>
@@ -213,7 +263,7 @@ const Dashboard = () => {
                   <h3 className="text-xl font-semibold text-white mb-2">No salary analyses yet</h3>
                   <p className="text-white/70 mb-6">Get started by analyzing your first job offer</p>
                   <Button 
-                    onClick={() => navigate('/#analyze')} 
+                    onClick={handleCreateNewAnalysis} 
                     className="bg-cyan hover:bg-cyan/80 text-white"
                   >
                     Analyze an Offer
@@ -224,8 +274,26 @@ const Dashboard = () => {
                   {analyses.map((analysis) => (
                     <Card key={analysis.id} className="glass-card border-0 overflow-hidden">
                       <CardHeader className="relative">
-                        <div className="absolute top-4 right-4">
-                          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        <div className="absolute top-4 right-4 flex gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleEditAnalysis(analysis)}
+                            className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+                          >
+                            <Pencil size={16} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleDeleteAnalysis(analysis)}
+                            className="h-8 w-8 text-white/70 hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                        <div className="mt-2">
+                          <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                             analysis.negotiation_status === 'Offer Accepted' ? 'bg-success/20 text-success' :
                             analysis.negotiation_status === 'Negotiation Failed' ? 'bg-destructive/20 text-destructive' :
                             analysis.negotiation_status === 'Counteroffer Sent' ? 'bg-amber-500/20 text-amber-500' :
@@ -288,7 +356,7 @@ const Dashboard = () => {
                         <p className="text-white/80 text-sm font-medium mb-1">Update Status:</p>
                         <div className="grid grid-cols-2 gap-2 w-full">
                           <Select 
-                            onValueChange={(value) => updateNegotiationStatus(analysis.id, value)}
+                            onValueChange={(value) => handleStatusUpdate(analysis.id, value)}
                             defaultValue={analysis.negotiation_status}
                             disabled={isUpdatingStatus && selectedAnalysisId === analysis.id}
                           >
@@ -455,6 +523,22 @@ const Dashboard = () => {
           </Tabs>
         </div>
       </main>
+      
+      {/* Modals */}
+      <EditAnalysisModal 
+        analysis={selectedAnalysis}
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+      />
+      
+      <DeleteAnalysisModal
+        analysis={selectedAnalysis}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onSuccess={handleDeleteSuccess}
+      />
+      
       <Footer />
     </div>
   );
