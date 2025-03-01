@@ -1,19 +1,50 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Mail, Key, User, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, Key, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { signIn, signUp, isLoading } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { signIn, signUp, isLoading, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("signin");
+  const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Get redirect parameter from URL if it exists
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get('redirect');
+    if (redirect) {
+      setRedirectAfterAuth(redirect);
+      sessionStorage.setItem('redirectAfterAuth', redirect);
+    }
+  }, [location]);
+
+  // Check URL for tab parameter
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab === 'signup') {
+      setActiveTab('signup');
+    }
+  }, [location]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +52,14 @@ const Auth = () => {
       toast.error("Please enter both email and password");
       return;
     }
-    await signIn(email, password);
+    
+    try {
+      await signIn(email, password);
+      // Navigation is handled in AuthContext after successful login
+    } catch (error) {
+      // Error is handled in AuthContext
+      console.error("Sign in error:", error);
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -34,7 +72,19 @@ const Auth = () => {
       toast.error("Passwords do not match");
       return;
     }
-    await signUp(email, password);
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    
+    try {
+      await signUp(email, password);
+      setActiveTab("signin");
+      toast.success("Account created! Please sign in.");
+    } catch (error) {
+      // Error is handled in AuthContext
+      console.error("Sign up error:", error);
+    }
   };
 
   return (
@@ -53,10 +103,14 @@ const Auth = () => {
           <div className="glass-card p-8 rounded-xl shadow-lg">
             <div className="text-center mb-6">
               <h1 className="text-2xl font-bold text-white mb-2">Welcome to NegotAI</h1>
-              <p className="text-white/70">Sign in to access your personalized salary insights</p>
+              <p className="text-white/70">
+                {redirectAfterAuth 
+                  ? "Sign in to access your personalized salary insights" 
+                  : "Sign in to access your dashboard"}
+              </p>
             </div>
             
-            <Tabs defaultValue="signin" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -78,6 +132,8 @@ const Auth = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-10 bg-white/5 border-white/10 text-white"
                         required
+                        disabled={isLoading}
+                        autoComplete="email"
                       />
                     </div>
                   </div>
@@ -95,13 +151,22 @@ const Auth = () => {
                       <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
                       <Input
                         id="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 bg-white/5 border-white/10 text-white"
+                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white"
                         required
+                        disabled={isLoading}
+                        autoComplete="current-password"
                       />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
                   </div>
                   
@@ -140,6 +205,8 @@ const Auth = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-10 bg-white/5 border-white/10 text-white"
                         required
+                        disabled={isLoading}
+                        autoComplete="email"
                       />
                     </div>
                   </div>
@@ -152,14 +219,24 @@ const Auth = () => {
                       <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
                       <Input
                         id="signup-password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 bg-white/5 border-white/10 text-white"
+                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white"
                         required
+                        disabled={isLoading}
+                        autoComplete="new-password"
                       />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
+                    <p className="text-xs text-white/50 mt-1">Password must be at least 6 characters</p>
                   </div>
                   
                   <div className="space-y-2">
@@ -170,13 +247,22 @@ const Auth = () => {
                       <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
                       <Input
                         id="confirm-password"
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="pl-10 bg-white/5 border-white/10 text-white"
+                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white"
                         required
+                        disabled={isLoading}
+                        autoComplete="new-password"
                       />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
                   </div>
                   

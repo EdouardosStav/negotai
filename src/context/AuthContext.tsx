@@ -4,6 +4,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { toast as sonnerToast } from 'sonner';
 
 interface AuthContextType {
   session: Session | null;
@@ -12,6 +13,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -30,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
         setUser(data.session?.user ?? null);
+        setIsAuthenticated(!!data.session);
       } catch (error) {
         console.error('Error fetching initial session:', error);
       } finally {
@@ -44,6 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log(`Auth event: ${event}`);
       setSession(newSession);
       setUser(newSession?.user ?? null);
+      setIsAuthenticated(!!newSession);
       
       if (event === 'SIGNED_IN') {
         toast({
@@ -51,12 +56,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: "Welcome back!",
           variant: "default",
         });
+        sonnerToast.success("Successfully signed in", {
+          description: "Welcome back!"
+        });
+        
+        // If user is coming from a specific page, redirect them back
+        const redirectPath = sessionStorage.getItem('redirectAfterAuth');
+        if (redirectPath) {
+          sessionStorage.removeItem('redirectAfterAuth');
+          navigate(redirectPath);
+        } else {
+          navigate('/dashboard');
+        }
       } else if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
           description: "You have been successfully signed out.",
           variant: "default",
         });
+        sonnerToast.success("Signed out");
+        navigate('/');
       }
     });
 
@@ -75,16 +94,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         throw error;
       }
-      
-      // Navigate to the dashboard after successful sign-in
-      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: "Sign in failed",
         description: error.message || "An error occurred during sign in",
         variant: "destructive",
       });
+      sonnerToast.error("Sign in failed", {
+        description: error.message || "An error occurred during sign in"
+      });
       console.error('Error signing in:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -105,13 +125,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Check your email for the confirmation link",
         variant: "default",
       });
+      sonnerToast.success("Sign up successful", {
+        description: "Check your email for the confirmation link"
+      });
     } catch (error: any) {
       toast({
         title: "Sign up failed",
         description: error.message || "An error occurred during sign up",
         variant: "destructive",
       });
+      sonnerToast.error("Sign up failed", {
+        description: error.message || "An error occurred during sign up"
+      });
       console.error('Error signing up:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -126,13 +153,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         throw error;
       }
-      
-      navigate('/');
     } catch (error: any) {
       toast({
         title: "Sign out failed",
         description: error.message || "An error occurred during sign out",
         variant: "destructive",
+      });
+      sonnerToast.error("Sign out failed", {
+        description: error.message || "An error occurred during sign out"
       });
       console.error('Error signing out:', error);
     } finally {
@@ -144,6 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     user,
     isLoading,
+    isAuthenticated,
     signIn,
     signUp,
     signOut,

@@ -11,7 +11,7 @@ const SalaryAnalysis = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<SalaryAnalysisInput>({
     jobTitle: "",
@@ -86,6 +86,11 @@ const SalaryAnalysis = () => {
       });
       
       setFormSubmitted(true);
+      
+      // Auto-save for authenticated users
+      if (isAuthenticated && user) {
+        await handleSaveAnalysis();
+      }
     } catch (error) {
       console.error("Error analyzing offer:", error);
       toast.error("Failed to analyze offer. Please try again.");
@@ -115,8 +120,20 @@ const SalaryAnalysis = () => {
   };
 
   const handleSaveAnalysis = async () => {
+    if (!isAuthenticated) {
+      // Store current analysis data in session storage for after login
+      sessionStorage.setItem('pendingAnalysis', JSON.stringify({
+        formData,
+        analysisResults
+      }));
+      
+      // Redirect to auth with return path
+      navigate("/auth?redirect=analyze");
+      return;
+    }
+    
     if (!user) {
-      navigate("/auth");
+      toast.error("User authentication error. Please try logging in again.");
       return;
     }
     
@@ -134,8 +151,36 @@ const SalaryAnalysis = () => {
   };
 
   const redirectToAuth = () => {
-    navigate("/auth");
+    // Store current analysis data in session storage for after login
+    sessionStorage.setItem('pendingAnalysis', JSON.stringify({
+      formData,
+      analysisResults
+    }));
+    
+    // Redirect to auth with return path
+    navigate("/auth?redirect=analyze");
   };
+
+  // Check for pending analysis after authentication
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const pendingAnalysis = sessionStorage.getItem('pendingAnalysis');
+      if (pendingAnalysis) {
+        try {
+          const parsedData = JSON.parse(pendingAnalysis);
+          setFormData(parsedData.formData);
+          setAnalysisResults(parsedData.analysisResults);
+          setFormSubmitted(true);
+          sessionStorage.removeItem('pendingAnalysis');
+          
+          // Show toast
+          toast.info("Analysis restored. You can now save it to your account.");
+        } catch (error) {
+          console.error("Error restoring pending analysis:", error);
+        }
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <section id="analyze" className="py-20 md:py-32 relative">
@@ -364,7 +409,7 @@ const SalaryAnalysis = () => {
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-bold text-white">Offer Analysis</h3>
                     <div className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium text-white/80">
-                      {user ? "Full Analysis" : "Sample Preview"}
+                      {isAuthenticated ? "Full Analysis" : "Sample Preview"}
                     </div>
                   </div>
                   
@@ -450,7 +495,7 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  {user ? (
+                  {isAuthenticated ? (
                     <button
                       onClick={handleSaveAnalysis}
                       className="w-full mt-6 py-2.5 px-4 rounded-lg bg-gradient-to-r from-primary/80 to-primary text-white hover:from-primary hover:to-primary/80 transition-all duration-300 text-sm"
