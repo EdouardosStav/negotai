@@ -67,23 +67,23 @@ export const useAnalysisSubmit = ({
         salary: numericSalary
       }, user?.id || '');
       
-      // Extract the analysis results
-      const { analysis, prompt } = response;
+      // Extract the analysis results from the response
+      const analysisData = response.analysis;
       
       // Update state with the analysis results
       setAnalysisResults({
-        fairnessScore: analysis.fairnessScore || 75,
-        suggestedCounteroffer: analysis.suggestedCounteroffer || Math.round(numericSalary * 1.1),
-        aiAnalysis: analysis
+        fairnessScore: analysisData.fairnessScore || 75,
+        suggestedCounteroffer: analysisData.suggestedCounteroffer || Math.round(numericSalary * 1.1),
+        aiAnalysis: analysisData
       });
       
-      console.log("AI Analysis completed:", analysis);
+      console.log("AI Analysis completed:", analysisData);
       
       // Update form state
       setFormSubmitted(true);
       
       // Show appropriate toast message
-      if (analysis.fallback) {
+      if (analysisData.fallback) {
         toast.info("Analysis based on offline data completed");
       } else {
         toast.success("Analysis completed successfully");

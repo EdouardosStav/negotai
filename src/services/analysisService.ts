@@ -28,7 +28,10 @@ export const analyzeSalaryOffer = async (data: SalaryAnalysisInput, userId: stri
     // Validate the response structure
     if (!response || !response.analysis) {
       console.warn('Invalid response format from analyze-salary function:', response);
-      return generateFallbackAnalysis(data);
+      return {
+        analysis: generateFallbackAnalysis(data),
+        prompt: "Service generated a fallback response due to analysis service connectivity issues."
+      };
     }
 
     // Clean and format the analysis data
