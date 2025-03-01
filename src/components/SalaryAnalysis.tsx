@@ -1,54 +1,46 @@
-
 import { useState, useEffect, useRef } from "react";
 import { CheckCircle, AlertCircle, DollarSign, ShieldCheck } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 const SalaryAnalysis = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
     experience: "",
     location: "",
-    salary: "",
+    salary: ""
   });
-  
   const analysisRef = useRef<HTMLDivElement>(null);
-  
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("opacity-100");
-            entry.target.classList.remove("opacity-0", "translate-y-10");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("opacity-100");
+          entry.target.classList.remove("opacity-0", "translate-y-10");
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
     const analysisEl = analysisRef.current;
     if (analysisEl) {
       observer.observe(analysisEl);
     }
-    
     return () => {
       if (analysisEl) {
         observer.unobserve(analysisEl);
       }
     };
   }, []);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const {
+      name,
+      value
+    } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In the pre-auth experience, we simulate the form submission
@@ -56,31 +48,25 @@ const SalaryAnalysis = () => {
     console.log("Form submitted, would require auth before showing full results");
     setFormSubmitted(true);
   };
-
   const handleSampleView = () => {
     // Pre-fill the form with sample data for the demo
     setFormData({
       jobTitle: "Software Engineer",
       experience: "3-5",
       location: "San Francisco, CA",
-      salary: "120000",
+      salary: "120000"
     });
     // Show sample results
     setFormSubmitted(true);
   };
-
-  return (
-    <section id="analyze" className="py-20 md:py-32 relative">
+  return <section id="analyze" className="py-20 md:py-32 relative">
       {/* Background elements */}
       <div className="absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-1/3 right-0 w-64 h-64 rounded-full bg-gradient-radial from-cyan/10 to-transparent blur-3xl"></div>
       
-      <div 
-        ref={analysisRef}
-        className="container mx-auto px-4 relative z-10 opacity-0 translate-y-10 transition-all duration-1000 ease-out"
-      >
-        <h2 className="section-heading text-center">Salary Analysis</h2>
+      <div ref={analysisRef} className="container mx-auto px-4 relative z-10 opacity-0 translate-y-10 transition-all duration-1000 ease-out">
+        <h2 className="section-heading text-center py-[8px]">Salary Analysis</h2>
         <p className="section-subheading text-center">
           See how your offer compares to market rates and get personalized negotiation insights
         </p>
@@ -97,30 +83,14 @@ const SalaryAnalysis = () => {
                     <label htmlFor="jobTitle" className="block text-sm font-medium text-white/80 mb-2">
                       Job Title
                     </label>
-                    <input 
-                      type="text"
-                      id="jobTitle"
-                      name="jobTitle"
-                      value={formData.jobTitle}
-                      onChange={handleChange}
-                      placeholder="Software Engineer"
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                      required
-                    />
+                    <input type="text" id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="Software Engineer" className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" required />
                   </div>
                   
                   <div>
                     <label htmlFor="experience" className="block text-sm font-medium text-white/80 mb-2">
                       Years of Experience
                     </label>
-                    <select
-                      id="experience"
-                      name="experience"
-                      value={formData.experience}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                      required
-                    >
+                    <select id="experience" name="experience" value={formData.experience} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" required>
                       <option value="" disabled className="bg-navy-dark">Select experience</option>
                       <option value="0-2" className="bg-navy-dark">0-2 years</option>
                       <option value="3-5" className="bg-navy-dark">3-5 years</option>
@@ -133,16 +103,7 @@ const SalaryAnalysis = () => {
                     <label htmlFor="location" className="block text-sm font-medium text-white/80 mb-2">
                       Location
                     </label>
-                    <input 
-                      type="text"
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      placeholder="San Francisco, CA"
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                      required
-                    />
+                    <input type="text" id="location" name="location" value={formData.location} onChange={handleChange} placeholder="San Francisco, CA" className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" required />
                   </div>
                   
                   <div>
@@ -153,28 +114,16 @@ const SalaryAnalysis = () => {
                       <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                         <DollarSign className="text-white/50" size={16} />
                       </div>
-                      <input 
-                        type="number"
-                        id="salary"
-                        name="salary"
-                        value={formData.salary}
-                        onChange={handleChange}
-                        placeholder="120000"
-                        className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                        required
-                      />
+                      <input type="number" id="salary" name="salary" value={formData.salary} onChange={handleChange} placeholder="120000" className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" required />
                     </div>
                   </div>
                   
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <button 
-                          type="submit"
-                          className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
+                        <button type="submit" className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
                           w-full transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
-                          bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
-                        >
+                          bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]">
                           Analyze My Offer
                         </button>
                       </TooltipTrigger>
@@ -196,8 +145,7 @@ const SalaryAnalysis = () => {
             
             {/* Results Section - Enhanced with glassmorphism and better typography */}
             <div className="glass-card p-8 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-              {!formSubmitted ? (
-                <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
+              {!formSubmitted ? <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
                   <div className="h-32 w-32 rounded-full bg-white/5 flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(0,140,255,0.2)]">
                     <ChartIcon />
                   </div>
@@ -213,15 +161,10 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  <button 
-                    onClick={handleSampleView}
-                    className="mt-6 py-2 px-4 bg-white/10 rounded-lg text-white hover:bg-white/15 transition-all duration-300 text-sm flex items-center"
-                  >
+                  <button onClick={handleSampleView} className="mt-6 py-2 px-4 bg-white/10 rounded-lg text-white hover:bg-white/15 transition-all duration-300 text-sm flex items-center">
                     View Sample Analysis
                   </button>
-                </div>
-              ) : (
-                <div className="animate-fade-in">
+                </div> : <div className="animate-fade-in">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-bold text-white">Offer Analysis</h3>
                     <div className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium text-white/80">
@@ -235,7 +178,9 @@ const SalaryAnalysis = () => {
                       <span className="text-amber-400 font-medium">75%</span>
                     </div>
                     <div className="w-full bg-white/10 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-amber-500 to-green-500 h-2 rounded-full" style={{ width: "75%" }}></div>
+                      <div className="bg-gradient-to-r from-amber-500 to-green-500 h-2 rounded-full" style={{
+                    width: "75%"
+                  }}></div>
                     </div>
                   </div>
                   
@@ -289,29 +234,17 @@ const SalaryAnalysis = () => {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                </div>
-              )}
+                </div>}
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
 
 // Chart icon SVG component - Increased size and improved color
-const ChartIcon = () => (
-  <svg 
-    width="64" 
-    height="64" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-    className="text-cyan"
-  >
+const ChartIcon = () => <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-cyan">
     <path d="M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     <path d="M20 8L16.0811 12.1827C15.9326 12.3412 15.8584 12.4204 15.7688 12.4614C15.6897 12.4976 15.6026 12.5125 15.516 12.5047C15.418 12.4958 15.3250 12.4522 15.1391 12.365L11.8609 10.635C11.6751 10.5478 11.582 10.5042 11.484 10.4953C11.3975 10.4875 11.3104 10.5024 11.2313 10.5386C11.1416 10.5796 11.0674 10.6588 10.919 10.8173L7 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
+  </svg>;
 export default SalaryAnalysis;
