@@ -1,40 +1,24 @@
 
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle, AlertCircle, DollarSign, ShieldCheck, Building, Gift, Award, Clock, Loader2 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useAuth } from "@/context/AuthContext";
-import { saveSalaryAnalysis, SalaryAnalysisInput } from "@/services/analysisService";
-import { toast } from "sonner";
+import { useRef, useEffect } from "react";
+import { useAnalysisForm } from "@/hooks/useAnalysisForm";
+import AnalysisForm from "./analysis/AnalysisForm";
+import AnalysisPreview from "./analysis/AnalysisPreview";
+import AnalysisResults from "./analysis/AnalysisResults";
 
 const SalaryAnalysis = () => {
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState<SalaryAnalysisInput>({
-    jobTitle: "",
-    experience: "",
-    location: "",
-    salary: "",
-    companyName: "",
-    benefitsPackage: "",
-    jobLevel: "",
-    employmentType: "Full-Time"
-  });
-  
-  // Static analysis results - won't update until form is submitted
-  const [analysisResults, setAnalysisResults] = useState({
-    fairnessScore: 80,
-    suggestedCounteroffer: 0
-  });
-  
-  // Static sample data for preview - won't update with form changes
-  const sampleData = {
-    jobLevel: "Senior",
-    employmentType: "Full-Time"
-  };
+  const {
+    formData,
+    formSubmitted,
+    isAnalyzing,
+    isSaving,
+    analysisResults,
+    sampleData,
+    handleChange,
+    handleSubmit,
+    handleSampleView,
+    handleSaveAnalysis,
+    redirectToAuth
+  } = useAnalysisForm();
   
   const analysisRef = useRef<HTMLDivElement>(null);
 
@@ -62,135 +46,10 @@ const SalaryAnalysis = () => {
     };
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Handle form input changes that need to update the formData state
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    handleChange(e);
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.jobTitle || !formData.location || !formData.salary || !formData.experience) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-    
-    try {
-      setIsAnalyzing(true);
-      
-      // Calculate suggested counteroffer (12% increase)
-      const salary = typeof formData.salary === 'string' ? parseFloat(formData.salary) : formData.salary;
-      const suggestedCounteroffer = Math.round(salary * 1.12);
-      
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setAnalysisResults({
-        fairnessScore: 80, // Mock score
-        suggestedCounteroffer
-      });
-      
-      setFormSubmitted(true);
-      
-      // Auto-save for authenticated users
-      if (isAuthenticated && user) {
-        await handleSaveAnalysis();
-      }
-    } catch (error) {
-      console.error("Error analyzing offer:", error);
-      toast.error("Failed to analyze offer. Please try again.");
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const handleSampleView = () => {
-    // Use static sample data that doesn't rely on form inputs
-    setFormData({
-      jobTitle: "Software Engineer",
-      experience: "3-5",
-      location: "San Francisco, CA",
-      salary: "120000",
-      companyName: "TechCorp Inc.",
-      benefitsPackage: "Health Insurance Premium Plan, 2% Equity, 8% Performance Bonus, Hybrid Work (3 days in office), 15 PTO days",
-      jobLevel: "Senior",
-      employmentType: "Full-Time"
-    });
-    
-    setAnalysisResults({
-      fairnessScore: 80,
-      suggestedCounteroffer: 134400 // 120000 * 1.12
-    });
-    
-    setFormSubmitted(true);
-  };
-
-  const handleSaveAnalysis = async () => {
-    if (!isAuthenticated) {
-      // Store current analysis data in session storage for after login
-      sessionStorage.setItem('pendingAnalysis', JSON.stringify({
-        formData,
-        analysisResults
-      }));
-      
-      // Redirect to auth with return path
-      navigate("/auth?redirect=analyze");
-      return;
-    }
-    
-    if (!user) {
-      toast.error("User authentication error. Please try logging in again.");
-      return;
-    }
-    
-    try {
-      setIsSaving(true);
-      await saveSalaryAnalysis(user.id, formData, analysisResults);
-      toast.success("Analysis saved successfully");
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Error saving analysis:", error);
-      toast.error("Failed to save analysis. Please try again.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const redirectToAuth = () => {
-    // Store current analysis data in session storage for after login
-    sessionStorage.setItem('pendingAnalysis', JSON.stringify({
-      formData,
-      analysisResults
-    }));
-    
-    // Redirect to auth with return path
-    navigate("/auth?redirect=analyze");
-  };
-
-  // Check for pending analysis after authentication
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const pendingAnalysis = sessionStorage.getItem('pendingAnalysis');
-      if (pendingAnalysis) {
-        try {
-          const parsedData = JSON.parse(pendingAnalysis);
-          setFormData(parsedData.formData);
-          setAnalysisResults(parsedData.analysisResults);
-          setFormSubmitted(true);
-          sessionStorage.removeItem('pendingAnalysis');
-          
-          // Show toast
-          toast.info("Analysis restored. You can now save it to your account.");
-        } catch (error) {
-          console.error("Error restoring pending analysis:", error);
-        }
-      }
-    }
-  }, [isAuthenticated, user, navigate]);
 
   return (
     <section id="analyze" className="py-20 md:py-32 relative">
@@ -206,337 +65,27 @@ const SalaryAnalysis = () => {
         
         <div className="max-w-4xl mx-auto mt-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="glass-card p-8 rounded-xl">
-              <h3 className="text-xl font-bold text-white mb-6">Analyze Your Offer</h3>
-              
-              <form onSubmit={handleSubmit}>
-                <div className="space-y-5">
-                  {/* Job Details Section - Reordered to match the Edit Salary Analysis modal */}
-                  <div>
-                    <label htmlFor="jobTitle" className="block text-sm font-medium text-white/80 mb-2">
-                      Job Title
-                    </label>
-                    <input 
-                      type="text" 
-                      id="jobTitle" 
-                      name="jobTitle" 
-                      value={formData.jobTitle} 
-                      onChange={handleChange} 
-                      placeholder="Software Engineer" 
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
-                      required 
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="companyName" className="block text-sm font-medium text-white/80 mb-2">
-                      Company Name <span className="text-white/50">(Optional)</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <Building className="text-white/50" size={16} />
-                      </div>
-                      <input 
-                        type="text" 
-                        id="companyName" 
-                        name="companyName" 
-                        value={formData.companyName} 
-                        onChange={handleChange} 
-                        placeholder="TechCorp Inc." 
-                        className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label htmlFor="jobLevel" className="block text-sm font-medium text-white/80 mb-2">
-                        Job Level <span className="text-white/50">(Optional)</span>
-                      </label>
-                      <select 
-                        id="jobLevel" 
-                        name="jobLevel" 
-                        value={formData.jobLevel} 
-                        onChange={handleChange} 
-                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                      >
-                        <option value="" disabled className="bg-navy-dark">Select job level</option>
-                        <option value="Junior" className="bg-navy-dark">Junior</option>
-                        <option value="Mid-Level" className="bg-navy-dark">Mid-Level</option>
-                        <option value="Senior" className="bg-navy-dark">Senior</option>
-                        <option value="Lead" className="bg-navy-dark">Lead</option>
-                        <option value="Director" className="bg-navy-dark">Director</option>
-                        <option value="VP" className="bg-navy-dark">VP</option>
-                        <option value="C-Level" className="bg-navy-dark">C-Level</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="employmentType" className="block text-sm font-medium text-white/80 mb-2">
-                        Employment Type
-                      </label>
-                      <select 
-                        id="employmentType" 
-                        name="employmentType" 
-                        value={formData.employmentType} 
-                        onChange={handleChange} 
-                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                        required
-                      >
-                        <option value="Full-Time" className="bg-navy-dark">Full-Time</option>
-                        <option value="Contract" className="bg-navy-dark">Contract</option>
-                        <option value="Internship" className="bg-navy-dark">Internship</option>
-                      </select>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label htmlFor="experience" className="block text-sm font-medium text-white/80 mb-2">
-                        Years of Experience
-                      </label>
-                      <select 
-                        id="experience" 
-                        name="experience" 
-                        value={formData.experience} 
-                        onChange={handleChange} 
-                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
-                        required
-                      >
-                        <option value="" disabled className="bg-navy-dark">Select experience</option>
-                        <option value="0-2" className="bg-navy-dark">0-2 years</option>
-                        <option value="3-5" className="bg-navy-dark">3-5 years</option>
-                        <option value="6-10" className="bg-navy-dark">6-10 years</option>
-                        <option value="10+" className="bg-navy-dark">10+ years</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="location" className="block text-sm font-medium text-white/80 mb-2">
-                        Location
-                      </label>
-                      <input 
-                        type="text" 
-                        id="location" 
-                        name="location" 
-                        value={formData.location} 
-                        onChange={handleChange} 
-                        placeholder="San Francisco, CA" 
-                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
-                        required 
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Salary Section */}
-                  <div>
-                    <label htmlFor="salary" className="block text-sm font-medium text-white/80 mb-2">
-                      Offered Salary (USD)
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <DollarSign className="text-white/50" size={16} />
-                      </div>
-                      <input 
-                        type="text" 
-                        id="salary" 
-                        name="salary" 
-                        value={formData.salary} 
-                        onChange={handleChange} 
-                        placeholder="120000" 
-                        className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
-                        required 
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Benefits Section */}
-                  <div>
-                    <label htmlFor="benefitsPackage" className="block text-sm font-medium text-white/80 mb-2">
-                      Benefits Package
-                    </label>
-                    <div className="relative">
-                      <div className="absolute top-3 left-4 pointer-events-none">
-                        <Gift className="text-white/50" size={16} />
-                      </div>
-                      <textarea 
-                        id="benefitsPackage" 
-                        name="benefitsPackage" 
-                        value={formData.benefitsPackage} 
-                        onChange={handleChange} 
-                        placeholder="Health Insurance Premium Plan, 2% Equity, 8% Performance Bonus, Hybrid Work (3 days in office), 15 PTO days" 
-                        className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all resize-none h-24" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <button 
-                    type="submit" 
-                    className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white shadow-lg
-                      w-full transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98]
-                      bg-[#008CFF] hover:shadow-[0_0_25px_rgba(0,140,255,0.6)]"
-                    disabled={isAnalyzing}
-                  >
-                    {isAnalyzing ? (
-                      <div className="flex items-center justify-center">
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Analyzing...
-                      </div>
-                    ) : (
-                      "Analyze My Offer"
-                    )}
-                  </button>
-                </div>
-              </form>
-              
-              <div className="flex items-center justify-center text-xs text-white/60 mt-4">
-                <a href="#privacy" className="hover:text-white mr-3 transition-colors">Privacy Policy</a>
-                <span className="mx-2">•</span>
-                <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
-              </div>
-            </div>
+            <AnalysisForm 
+              formData={formData}
+              handleChange={handleFormChange}
+              handleSubmit={handleSubmit}
+              isAnalyzing={isAnalyzing}
+            />
             
             <div className="glass-card p-8 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
               {!formSubmitted ? (
-                <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
-                  <div className="h-32 w-32 rounded-full bg-white/5 flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(0,140,255,0.2)]">
-                    <ChartIcon />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3">Insights Preview</h3>
-                  <p className="text-white/70 mb-4 leading-relaxed">
-                    Submit your offer details to get personalized salary insights and negotiation strategies.
-                  </p>
-                  <div className="glass-card p-5 rounded-lg text-left text-sm text-white/80 shadow-lg space-y-3 w-full">
-                    <p className="font-medium text-white mb-2">Example insights:</p>
-                    <div className="space-y-3">
-                      {/* Static sample insights that don't update with form changes */}
-                      <p className="py-1.5 px-2 bg-white/5 rounded-md">Your salary offer is 15% below market value for a {sampleData.jobLevel} role. Consider negotiating for $135K – $145K.</p>
-                      <p className="py-1.5 px-2 bg-white/5 rounded-md">Your benefits package is below industry standard. Request additional PTO days and higher equity percentage.</p>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={handleSampleView} 
-                    className="mt-6 py-2 px-4 bg-white/10 rounded-lg text-white hover:bg-white/15 transition-all duration-300 text-sm flex items-center"
-                  >
-                    View Sample Analysis
-                  </button>
-                </div>
+                <AnalysisPreview 
+                  handleSampleView={handleSampleView}
+                  sampleData={sampleData}
+                />
               ) : (
-                <div className="animate-fade-in">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-white">Offer Analysis</h3>
-                    <div className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium text-white/80">
-                      {isAuthenticated ? "Full Analysis" : "Sample Preview"}
-                    </div>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <div className="flex justify-between mb-2">
-                      <span className="text-white/80">Fairness Score</span>
-                      <span className="text-amber-400 font-medium">{analysisResults.fairnessScore}%</span>
-                    </div>
-                    <div className="w-full bg-white/10 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-amber-500 to-green-500 h-2 rounded-full" 
-                        style={{ width: `${analysisResults.fairnessScore}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-white/70 text-xs mt-2">
-                      Your offer is well above market value considering your job level and benefits package.
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-4 mb-6">
-                    {formData.companyName && (
-                      <div className="flex items-start gap-3">
-                        <Building className="text-cyan mt-1 flex-shrink-0" size={18} />
-                        <p className="text-white/80 text-sm">
-                          <span className="font-medium text-white block mb-1">Company Specific</span>
-                          Your offer is 75% above average for {formData.jobLevel || "Senior"} {formData.jobTitle} roles at {formData.companyName}
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                      <p className="text-white/80 text-sm">
-                        <span className="font-medium text-white block mb-1">Competitive Base Salary</span>
-                        Your offer is 70% above industry average for {formData.jobLevel || "Senior"} {formData.jobTitle} roles in {formData.location}
-                      </p>
-                    </div>
-                    
-                    {formData.benefitsPackage && (
-                      <div className="flex items-start gap-3">
-                        <Gift className="text-amber-400 mt-1 flex-shrink-0" size={18} />
-                        <p className="text-white/80 text-sm">
-                          <span className="font-medium text-white block mb-1">Benefits Assessment</span>
-                          Your benefits package is <span className="text-amber-400 font-medium">At Industry Standard</span>. Your equity offer (2%) is competitive, but your PTO (15 days) is below the average of 20 days for your level.
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-start gap-3">
-                      <Award className="text-amber-400 mt-1 flex-shrink-0" size={18} />
-                      <p className="text-white/80 text-sm">
-                        <span className="font-medium text-white block mb-1">Bonus & Stock Potential</span>
-                        Your 8% performance bonus is slightly below the 10% industry average for {formData.jobLevel || "Senior"} roles.
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <Clock className="text-success mt-1 flex-shrink-0" size={18} />
-                      <p className="text-white/80 text-sm">
-                        <span className="font-medium text-white block mb-1">Growth Potential</span>
-                        Salary growth trajectory aligns with industry standards for {formData.employmentType} positions
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
-                    <p className="text-white/90 text-sm mb-2">
-                      <span className="font-medium text-white">Suggested Counter-Offer:</span>
-                    </p>
-                    <p className="text-2xl font-bold text-gradient">
-                      ${analysisResults.suggestedCounteroffer.toLocaleString()}
-                    </p>
-                    <p className="text-white/70 text-xs mt-1">
-                      12% increase with strong justification based on market data
-                    </p>
-                    <div className="mt-3 pt-3 border-t border-white/10">
-                      <p className="text-sm text-white mb-2">Additional negotiation points:</p>
-                      <ul className="text-xs text-white/70 space-y-1">
-                        <li>• Request 20 PTO days (industry standard is 20-25 days)</li>
-                        <li>• Negotiate for 10% performance bonus (currently 8%)</li>
-                        <li>• Ask about professional development budget</li>
-                      </ul>
-                    </div>
-                  </div>
-                  
-                  {isAuthenticated ? (
-                    <button
-                      onClick={handleSaveAnalysis}
-                      className="w-full mt-6 py-2.5 px-4 rounded-lg bg-gradient-to-r from-primary/80 to-primary text-white hover:from-primary hover:to-primary/80 transition-all duration-300 text-sm"
-                      disabled={isSaving}
-                    >
-                      {isSaving ? (
-                        <div className="flex items-center justify-center">
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Saving...
-                        </div>
-                      ) : (
-                        "Save Analysis to Dashboard"
-                      )}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={redirectToAuth}
-                      className="w-full mt-6 py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 text-sm"
-                    >
-                      Sign in for Full Analysis & Report
-                    </button>
-                  )}
-                </div>
+                <AnalysisResults 
+                  formData={formData}
+                  analysisResults={analysisResults}
+                  handleSaveAnalysis={handleSaveAnalysis}
+                  redirectToAuth={redirectToAuth}
+                  isSaving={isSaving}
+                />
               )}
             </div>
           </div>
@@ -545,12 +94,5 @@ const SalaryAnalysis = () => {
     </section>
   );
 };
-
-const ChartIcon = () => (
-  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-cyan">
-    <path d="M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M20 8L16.0811 12.1827C15.9326 12.3412 15.8584 12.4204 15.7688 12.4614C15.6897 12.4976 15.6026 12.5125 15.516 12.5047C15.418 12.4958 15.3250 12.4522 15.1391 12.365L11.8609 10.635C11.6751 10.5478 11.582 10.5042 11.484 10.4953C11.3975 10.4875 11.3104 10.5024 11.2313 10.5386C11.1416 10.5796 11.0674 10.6588 10.919 10.8173L7 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 export default SalaryAnalysis;
