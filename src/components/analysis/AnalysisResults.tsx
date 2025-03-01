@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Building, CheckCircle, Gift, Award, Clock, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -58,6 +57,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       currency: 'USD',
       maximumFractionDigits: 0
     }).format(amount);
+  };
+
+  // Fix for TS2363 error - ensure we are using number values for calculations
+  const getPercentIncrease = () => {
+    const offeredSalary = formData?.salary ? Number(formData.salary) : (analysis?.offered_salary || 100000);
+    return Math.round((suggestedCounteroffer / offeredSalary - 1) * 100);
   };
 
   return (
@@ -150,7 +155,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         </p>
         <p className="text-white/70 text-xs mt-1">
           {fairnessScore < 70 
-            ? `${Math.round((suggestedCounteroffer / (formData?.salary || analysis?.offered_salary || 100000) - 1) * 100)}% increase based on market averages` 
+            ? `${getPercentIncrease()}% increase based on market averages` 
             : "This is a competitive offer, but some increase may be possible"}
         </p>
         <div className="mt-3 pt-3 border-t border-white/10">
