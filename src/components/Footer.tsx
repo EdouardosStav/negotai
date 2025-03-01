@@ -33,9 +33,9 @@ const Footer = () => {
   return (
     <>
       <footer className="pt-16 pb-8 relative" id="contact">
-        {/* Background elements */}
+        {/* Background elements - adding pointer-events-none to fix clickable area */}
         <div className="absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
         
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
