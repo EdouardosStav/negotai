@@ -14,6 +14,10 @@ interface AnalysisResultsProps {
   analysisResults?: {
     fairnessScore: number;
     suggestedCounteroffer: number;
+    counterofferRange?: {
+      min: number;
+      max: number;
+    };
     aiAnalysis?: any;
   };
   handleSaveAnalysis?: () => void;
@@ -45,8 +49,16 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   
   // Determine scores based on which props are passed
   const fairnessScore = analysisResults?.fairnessScore || analysis?.fairness_score || 80;
+  
+  // Get counter-offer range or calculate one if not provided
+  const counterofferRange = analysisResults?.counterofferRange || 
+    (analysis?.ai_analysis?.counterofferRange) || 
+    calculateCounterOfferRange();
+  
+  // Single counteroffer value (for backward compatibility)
   const suggestedCounteroffer = analysisResults?.suggestedCounteroffer || 
-    (analysis ? Math.round(analysis.offered_salary * 1.12) : 0);
+    analysis?.suggested_counteroffer ||
+    (counterofferRange ? Math.round((counterofferRange.min + counterofferRange.max) / 2) : 0);
   
   // Get AI analysis data
   const aiAnalysis = analysisResults?.aiAnalysis || analysis?.ai_analysis || null;
@@ -60,14 +72,69 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     }).format(amount);
   };
 
-  // Fix for TS2363 error - ensure we are using number values for calculations
-  const getPercentIncrease = () => {
+  // Calculate a counteroffer range based on job level and offered salary
+  function calculateCounterOfferRange() {
     // Convert salary to number if it's a string
     const offeredSalary = formData?.salary ? 
       (typeof formData.salary === 'string' ? Number(formData.salary) : formData.salary) : 
       (analysis?.offered_salary || 100000);
     
-    return Math.round((suggestedCounteroffer / offeredSalary - 1) * 100);
+    // Default ranges for different levels
+    let minIncrease = 1.10; // 10% minimum increase
+    let maxIncrease = 1.20; // 20% maximum increase
+    
+    // Adjust based on fairness score
+    if (fairnessScore < 60) {
+      // Very unfair offers get bigger suggested increases
+      minIncrease = 1.25; // 25% minimum 
+      maxIncrease = 1.40; // 40% maximum
+    } else if (fairnessScore < 75) {
+      // Somewhat unfair offers
+      minIncrease = 1.15; // 15% minimum
+      maxIncrease = 1.30; // 30% maximum
+    } else if (fairnessScore >= 90) {
+      // Very fair offers
+      minIncrease = 1.03; // 3% minimum
+      maxIncrease = 1.08; // 8% maximum
+    }
+    
+    // Ensure the counter offer is meaningful (at least 10-15% higher for low salaries)
+    const min = Math.round(offeredSalary * minIncrease);
+    const max = Math.round(offeredSalary * maxIncrease);
+    
+    return { min, max };
+  }
+
+  // Get justification text for counteroffer
+  const getCounterOfferJustification = () => {
+    // Convert salary to number if it's a string
+    const offeredSalary = formData?.salary ? 
+      (typeof formData.salary === 'string' ? Number(formData.salary) : formData.salary) : 
+      (analysis?.offered_salary || 100000);
+    
+    if (aiAnalysis?.counterofferJustification?.text) {
+      return aiAnalysis.counterofferJustification.text;
+    }
+    
+    if (fairnessScore < 70) {
+      return `${formatPercentIncrease()}% increase to align with market rates for ${jobLevel} ${jobTitle} roles in ${location}`;
+    } else if (fairnessScore < 85) {
+      return `This increase would bring your compensation in line with industry standards for your experience level`;
+    } else {
+      return `Your offer is competitive, but a small increase may still be negotiable`;
+    }
+  };
+
+  // Calculate percentage increase from offered to suggested (middle of range)
+  const formatPercentIncrease = () => {
+    // Convert salary to number if it's a string
+    const offeredSalary = formData?.salary ? 
+      (typeof formData.salary === 'string' ? Number(formData.salary) : formData.salary) : 
+      (analysis?.offered_salary || 100000);
+    
+    // Use middle of range for percentage calculation
+    const midRange = (counterofferRange.min + counterofferRange.max) / 2;
+    return Math.round((midRange / offeredSalary - 1) * 100);
   };
 
   return (
@@ -117,7 +184,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <div className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Competitive Base Salary</span>
             <p>{aiAnalysis?.marketComparison?.text || 
-               `The average salary for this role in ${location} ranges between $${Math.round((suggestedCounteroffer * 0.9)/1000)}k-$${Math.round((suggestedCounteroffer * 1.1)/1000)}k.`}</p>
+               `The average salary for this role in ${location} ranges between ${formatCurrency(counterofferRange.min * 0.9)}-${formatCurrency(counterofferRange.max)}.`}</p>
           </div>
         </div>
         
@@ -153,18 +220,16 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       
       <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
         <p className="text-white/90 text-sm mb-2">
-          <span className="font-medium text-white">Suggested Counter-Offer:</span>
+          <span className="font-medium text-white">Suggested Counter-Offer Range:</span>
         </p>
         <p className="text-2xl font-bold text-gradient">
-          {formatCurrency(suggestedCounteroffer)}
+          {formatCurrency(counterofferRange.min)} - {formatCurrency(counterofferRange.max)}
         </p>
         <p className="text-white/70 text-xs mt-1">
-          {fairnessScore < 70 
-            ? `${getPercentIncrease()}% increase based on market averages` 
-            : "This is a competitive offer, but some increase may be possible"}
+          {getCounterOfferJustification()}
         </p>
         <div className="mt-3 pt-3 border-t border-white/10">
-          <p className="text-sm text-white mb-2">Additional negotiation points:</p>
+          <p className="text-sm text-white mb-2">Negotiation strategy:</p>
           <ul className="text-xs text-white/70 space-y-1">
             {aiAnalysis?.negotiationPoints ? (
               aiAnalysis.negotiationPoints.map((point: string, index: number) => (
@@ -177,15 +242,19 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
               <>
                 <li className="flex items-start gap-1.5">
                   <span className="text-success">✓</span> 
-                  <span>Request 20 PTO days (industry standard is 20-25 days)</span>
+                  <span>Request {formatCurrency(counterofferRange.min)} - {formatCurrency(counterofferRange.max)} based on market rates</span>
                 </li>
                 <li className="flex items-start gap-1.5">
                   <span className="text-success">✓</span> 
-                  <span>Negotiate for 10% performance bonus (industry standard)</span>
+                  <span>Negotiate for 10-15% performance bonus (industry standard)</span>
                 </li>
                 <li className="flex items-start gap-1.5">
                   <span className="text-success">✓</span> 
-                  <span>Ask about professional development budget</span>
+                  <span>Ask about professional development budget and learning opportunities</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-success">✓</span> 
+                  <span>Discuss flexible work arrangements (remote/hybrid options)</span>
                 </li>
               </>
             )}

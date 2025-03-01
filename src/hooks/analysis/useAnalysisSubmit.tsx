@@ -10,6 +10,10 @@ type UseAnalysisSubmitProps = {
   setAnalysisResults: (results: {
     fairnessScore: number;
     suggestedCounteroffer: number;
+    counterofferRange?: {
+      min: number;
+      max: number;
+    };
     aiAnalysis?: any;
   } | null) => void;
   setFormSubmitted: (value: boolean) => void;
@@ -20,6 +24,10 @@ type UseAnalysisSubmitProps = {
 type AnalysisData = {
   fairnessScore: number;
   suggestedCounteroffer: number;
+  counterofferRange?: {
+    min: number;
+    max: number;
+  };
   marketComparison: { text: string };
   companySpecific: { text: string };
   benefitsAssessment: { text: string };
@@ -87,6 +95,10 @@ export const useAnalysisSubmit = ({
       setAnalysisResults({
         fairnessScore: analysisData.fairnessScore || 75,
         suggestedCounteroffer: analysisData.suggestedCounteroffer || Math.round(numericSalary * 1.1),
+        counterofferRange: analysisData.counterofferRange || {
+          min: Math.round(numericSalary * 1.1),
+          max: Math.round(numericSalary * 1.2)
+        },
         aiAnalysis: analysisData
       });
       
@@ -119,13 +131,21 @@ export const useAnalysisSubmit = ({
       if (formData.salary) {
         const numericSalary = parseFloat(formData.salary.toString());
         
+        // Calculate counteroffer range for fallback
+        const counterMin = Math.round(numericSalary * 1.1);
+        const counterMax = Math.round(numericSalary * 1.2);
+        
         // Provide a basic fallback analysis with disclaimer
         setAnalysisResults({
           fairnessScore: 70,
-          suggestedCounteroffer: Math.round(numericSalary * 1.12),
+          suggestedCounteroffer: Math.round((counterMin + counterMax) / 2),
+          counterofferRange: {
+            min: counterMin,
+            max: counterMax
+          },
           aiAnalysis: {
             marketComparison: {
-              text: `The average salary for a ${formData.jobLevel} ${formData.jobTitle} in ${formData.location} ranges from ${Math.round(numericSalary * 0.9)} to ${Math.round(numericSalary * 1.1)} according to market data.`
+              text: `The average salary for a ${formData.jobLevel} ${formData.jobTitle} in ${formData.location} ranges from ${new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD', maximumFractionDigits: 0}).format(counterMin * 0.9)} to ${new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD', maximumFractionDigits: 0}).format(counterMax)}.`
             },
             companySpecific: {
               text: formData.companyName ? 
@@ -138,14 +158,14 @@ export const useAnalysisSubmit = ({
                 `Benefits information not provided - request details on healthcare, retirement plans, and PTO.`
             },
             bonusAndEquity: {
-              text: `Performance bonuses for similar roles typically range from 8-10% of base salary. Inquire about equity options if available.`
+              text: `Performance bonuses for similar roles typically range from 10-15% of base salary. Inquire about equity options if available.`
             },
             growthPotential: {
               text: `Career advancement opportunities should include clear promotion paths and professional development resources.`
             },
             negotiationPoints: [
-              "Request a salary increase to align with market standards",
-              "Inquire about performance bonus structure",
+              `Request ${new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD', maximumFractionDigits: 0}).format(counterMin)} - ${new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD', maximumFractionDigits: 0}).format(counterMax)} based on market standards`,
+              "Negotiate for a 10-15% performance bonus",
               "Discuss professional development opportunities",
               "Ask about flexible work arrangements"
             ],
