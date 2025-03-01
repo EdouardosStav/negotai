@@ -16,6 +16,19 @@ type UseAnalysisSubmitProps = {
   setAnalysisError: (error: string | null) => void;
 };
 
+// Define a type for the analysis data that includes the fallback property
+type AnalysisData = {
+  fairnessScore: number;
+  suggestedCounteroffer: number;
+  marketComparison: { text: string };
+  companySpecific: { text: string };
+  benefitsAssessment: { text: string };
+  bonusAndEquity: { text: string };
+  growthPotential: { text: string };
+  negotiationPoints: string[];
+  fallback?: boolean; // Add the fallback property as optional
+};
+
 export const useAnalysisSubmit = ({
   formData,
   setIsAnalyzing,
@@ -68,7 +81,7 @@ export const useAnalysisSubmit = ({
       }, user?.id || '');
       
       // Extract the analysis results from the response
-      const analysisData = response.analysis;
+      const analysisData = response.analysis as AnalysisData;
       
       // Update state with the analysis results
       setAnalysisResults({
