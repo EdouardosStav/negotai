@@ -29,11 +29,28 @@ const Index = () => {
       });
     });
     
-    // Clean up event listeners
+    // Add CSS to improve text rendering
+    const style = document.createElement('style');
+    style.textContent = `
+      h1, h2, h3, h4, h5, h6 {
+        letter-spacing: 0.01em;
+        line-height: 1.3;
+        text-rendering: optimizeLegibility;
+      }
+      p {
+        letter-spacing: 0.005em;
+        line-height: 1.6;
+        text-rendering: optimizeLegibility;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Clean up
     return () => {
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.removeEventListener('click', function(e) {});
       });
+      document.head.removeChild(style);
     };
   }, []);
 
@@ -45,7 +62,9 @@ const Index = () => {
           <Hero />
         </div>
         <Features />
-        <SalaryAnalysis />
+        <div id="analyze">
+          <SalaryAnalysis />
+        </div>
         <Testimonials />
       </main>
       <Footer />

@@ -39,6 +39,13 @@ const Navbar = () => {
   };
 
   const scrollToSection = (sectionId: string) => {
+    // Check if we're on the home page
+    if (window.location.pathname !== '/') {
+      // If not, navigate to home and then scroll after page loads
+      window.location.href = `/#${sectionId}`;
+      return;
+    }
+    
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({ behavior: "smooth" });
@@ -62,21 +69,28 @@ const Navbar = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <span className="text-xl font-bold text-white">NegotAI</span>
+            <Link 
+              to="/" 
+              className="text-xl font-bold text-white hover:text-cyan transition-colors duration-300"
+            >
+              NegotAI
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a 
-              href="#home" 
+            <Link 
+              to="/" 
               className="nav-link"
               onClick={(e) => {
-                e.preventDefault();
-                scrollToSection("home");
+                if (window.location.pathname === '/') {
+                  e.preventDefault();
+                  scrollToSection("home");
+                }
               }}
             >
               Home
-            </a>
+            </Link>
             
             {/* Features Dropdown */}
             <div className="relative" ref={dropdownRef}>
@@ -150,16 +164,19 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <nav className="md:hidden flex flex-col items-center space-y-4 pt-6 pb-6 animate-fade-in">
-            <a 
-              href="#home" 
+            <Link 
+              to="/" 
               className="text-white hover:text-cyan transition-colors"
               onClick={(e) => {
-                e.preventDefault();
-                scrollToSection("home");
+                if (window.location.pathname === '/') {
+                  e.preventDefault();
+                  scrollToSection("home");
+                }
+                setIsMobileMenuOpen(false);
               }}
             >
               Home
-            </a>
+            </Link>
             
             {/* Mobile Features Dropdown */}
             <div className="w-full text-center">
@@ -208,6 +225,7 @@ const Navbar = () => {
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection("contact");
+                setIsMobileMenuOpen(false);
               }}
             >
               Contact

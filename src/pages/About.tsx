@@ -10,6 +10,27 @@ const About = () => {
     
     // Scroll to top on page load
     window.scrollTo(0, 0);
+    
+    // Add CSS to improve text rendering
+    const style = document.createElement('style');
+    style.textContent = `
+      h1, h2, h3, h4, h5, h6 {
+        letter-spacing: 0.01em;
+        line-height: 1.3;
+        text-rendering: optimizeLegibility;
+      }
+      p {
+        letter-spacing: 0.005em;
+        line-height: 1.6;
+        text-rendering: optimizeLegibility;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Clean up
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   return (
@@ -40,7 +61,7 @@ const About = () => {
           </div>
           
           {/* Our Mission Section */}
-          <div className="max-w-4xl mx-auto mb-20">
+          <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
             <div className="glass-card p-8 rounded-xl">
               <p className="text-white/80 mb-6 leading-relaxed">
@@ -70,60 +91,6 @@ const About = () => {
                   <p className="text-white/70">
                     We help professionals advance their careers by securing compensation packages that reflect their true value.
                   </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Our Team Section */}
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white mb-6">Our Team</h2>
-            <div className="glass-card p-8 rounded-xl">
-              <p className="text-white/80 mb-8 leading-relaxed text-center">
-                NegotAI is built by a diverse team of experts in AI, data science, HR, and negotiation psychology.
-              </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Team Member 1 */}
-                <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan to-primary mb-4"></div>
-                  <h3 className="text-lg font-semibold text-white">Alex Chen</h3>
-                  <p className="text-white/70 text-sm">CEO & Founder</p>
-                </div>
-                
-                {/* Team Member 2 */}
-                <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan to-primary mb-4"></div>
-                  <h3 className="text-lg font-semibold text-white">Sophia Rodriguez</h3>
-                  <p className="text-white/70 text-sm">Head of AI Research</p>
-                </div>
-                
-                {/* Team Member 3 */}
-                <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan to-primary mb-4"></div>
-                  <h3 className="text-lg font-semibold text-white">Marcus Johnson</h3>
-                  <p className="text-white/70 text-sm">Lead Data Scientist</p>
-                </div>
-                
-                {/* Team Member 4 */}
-                <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan to-primary mb-4"></div>
-                  <h3 className="text-lg font-semibold text-white">Priya Patel</h3>
-                  <p className="text-white/70 text-sm">HR Specialist</p>
-                </div>
-                
-                {/* Team Member 5 */}
-                <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan to-primary mb-4"></div>
-                  <h3 className="text-lg font-semibold text-white">David Kim</h3>
-                  <p className="text-white/70 text-sm">UI/UX Designer</p>
-                </div>
-                
-                {/* Team Member 6 */}
-                <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan to-primary mb-4"></div>
-                  <h3 className="text-lg font-semibold text-white">Emma Wilson</h3>
-                  <p className="text-white/70 text-sm">Marketing Director</p>
                 </div>
               </div>
             </div>
