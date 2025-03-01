@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
+import { Mail, Heart } from "lucide-react"; // Added Mail import
 
 interface FAQItem {
   question: string;
@@ -260,6 +261,16 @@ const FAQ = () => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
 
+  // Function to handle the contact button click
+  const handleContactClick = () => {
+    // Find the button with the "nav-link" class and dispatch a click event on it
+    const contactButton = document.querySelector('button.nav-link[data-target="contact"]');
+    if (contactButton) {
+      // Use dispatchEvent instead of click()
+      contactButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-navy overflow-x-hidden">
       <Navbar />
@@ -375,16 +386,12 @@ const FAQ = () => {
                 <Mail size={18} className="mr-2" />
                 Email Support
               </a>
-              <Link
-                to="/"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('button.nav-link')?.click();
-                }}
+              <button
+                onClick={handleContactClick}
                 className="inline-flex items-center justify-center px-6 py-3 rounded-md bg-gradient-to-r from-cyan to-blue-500 text-white hover:opacity-90 transition-opacity"
               >
                 Contact Us
-              </Link>
+              </button>
             </div>
           </div>
         </div>

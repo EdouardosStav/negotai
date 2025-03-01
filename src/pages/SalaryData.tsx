@@ -1,8 +1,36 @@
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import { Link } from "react-router-dom";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+interface SalaryData {
+  jobTitle: string;
+  location: string;
+  experienceLevel: string;
+  averageSalary: number;
+  salaryRange: [number, number];
+  jobOpenings: number;
+  skills: string[];
+}
 
 const SalaryData = () => {
   // Update page title
@@ -10,350 +38,315 @@ const SalaryData = () => {
     document.title = "Salary Data | NegotAI";
   }, []);
 
-  // Sample data for industry salary ranges
-  const industrySalaryData = [
-    { industry: "Technology", entry: 65000, mid: 105000, senior: 150000 },
-    { industry: "Finance", entry: 60000, mid: 95000, senior: 140000 },
-    { industry: "Healthcare", entry: 55000, mid: 85000, senior: 125000 },
-    { industry: "Marketing", entry: 50000, mid: 80000, senior: 120000 },
-    { industry: "Education", entry: 45000, mid: 65000, senior: 95000 }
-  ];
+  const [jobTitle, setJobTitle] = useState("");
+  const [location, setLocation] = useState("");
+  const [experienceLevel, setExperienceLevel] = useState("");
+  const [salaryData, setSalaryData] = useState<SalaryData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
+    const [comparisonData, setComparisonData] = useState<SalaryData[]>([]);
+    const [showComparison, setShowComparison] = useState(false);
 
-  // Sample data for location-based salary insights
-  const locationSalaryData = [
-    { location: "San Francisco", salary: 135000 },
-    { location: "New York", salary: 125000 },
-    { location: "Seattle", salary: 120000 },
-    { location: "Boston", salary: 115000 },
-    { location: "Chicago", salary: 105000 },
-    { location: "Austin", salary: 100000 },
-    { location: "Denver", salary: 95000 }
-  ];
+  useEffect(() => {
+    if (salaryData) {
+      setChartData({
+        labels: ['Average Salary', 'Salary Range (Low)', 'Salary Range (High)'],
+        datasets: [
+          {
+            label: 'Salary Information',
+            data: [salaryData.averageSalary, salaryData.salaryRange[0], salaryData.salaryRange[1]],
+            backgroundColor: [
+              'rgba(54, 162, 235, 0.6)',
+              'rgba(75, 192, 192, 0.6)',
+              'rgba(153, 102, 255, 0.6)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      });
+    }
+  }, [salaryData]);
 
-  // Sample data for market trends
-  const marketTrendsData = [
-    { year: "2018", rate: 1.0 },
-    { year: "2019", rate: 1.03 },
-    { year: "2020", rate: 1.05 },
-    { year: "2021", rate: 1.10 },
-    { year: "2022", rate: 1.16 },
-    { year: "2023", rate: 1.21 },
-  ];
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Simulate fetching salary data from an API
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const mockSalaryData: SalaryData = {
+        jobTitle: jobTitle,
+        location: location,
+        experienceLevel: experienceLevel,
+        averageSalary: Math.floor(Math.random() * (150000 - 80000 + 1)) + 80000,
+        salaryRange: [
+          Math.floor(Math.random() * (80000 - 60000 + 1)) + 60000,
+          Math.floor(Math.random() * (200000 - 150000 + 1)) + 150000,
+        ],
+        jobOpenings: Math.floor(Math.random() * 50) + 10,
+        skills: ["JavaScript", "React", "Node.js", "HTML", "CSS"],
+      };
+
+            setSalaryData(mockSalaryData);
+            setShowComparison(false); // Reset comparison view when new data is fetched
+    } catch (err) {
+      setError("Failed to fetch salary data. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+    const handleCompare = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            // Simulate fetching comparison data from an API
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            const mockComparisonData: SalaryData[] = [
+                {
+                    jobTitle: jobTitle,
+                    location: "New York, NY",
+                    experienceLevel: experienceLevel,
+                    averageSalary: Math.floor(Math.random() * (160000 - 90000 + 1)) + 90000,
+                    salaryRange: [
+                        Math.floor(Math.random() * (90000 - 70000 + 1)) + 70000,
+                        Math.floor(Math.random() * (220000 - 160000 + 1)) + 160000,
+                    ],
+                    jobOpenings: Math.floor(Math.random() * 60) + 15,
+                    skills: ["JavaScript", "React", "Node.js", "HTML", "CSS"],
+                },
+                {
+                    jobTitle: jobTitle,
+                    location: "Seattle, WA",
+                    experienceLevel: experienceLevel,
+                    averageSalary: Math.floor(Math.random() * (140000 - 70000 + 1)) + 70000,
+                    salaryRange: [
+                        Math.floor(Math.random() * (70000 - 50000 + 1)) + 50000,
+                        Math.floor(Math.random() * (180000 - 130000 + 1)) + 130000,
+                    ],
+                    jobOpenings: Math.floor(Math.random() * 40) + 5,
+                    skills: ["JavaScript", "React", "Node.js", "HTML", "CSS"],
+                },
+            ];
+
+            setComparisonData(mockComparisonData);
+            setShowComparison(true);
+
+            // Prepare chart data for comparison
+            const comparisonLabels = mockComparisonData.map(item => item.location);
+            const comparisonDatasets = [
+                {
+                    label: 'Average Salary',
+                    data: mockComparisonData.map(item => item.averageSalary),
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderWidth: 1,
+                },
+            ];
+
+            setChartData({
+                labels: comparisonLabels,
+                datasets: comparisonDatasets,
+            });
+
+
+        } catch (err) {
+            setError("Failed to fetch comparison data. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
   return (
     <div className="min-h-screen bg-navy overflow-x-hidden">
       <Navbar />
-      
+
       <main className="container mx-auto px-4 pt-32 pb-20">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Salary Data Insights
+            Salary Data
           </h1>
-          <p className="text-white/70 text-lg mb-12 max-w-3xl">
-            Access comprehensive salary data across industries, locations, and experience levels to benchmark your compensation and make informed career decisions.
+          <p className="text-white/70 text-lg mb-12">
+            Explore salary ranges and job market insights for your desired role
+            and location.
           </p>
-          
-          {/* Industry Salary Section */}
-          <section className="mb-20">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Industry-Specific Salary Ranges
-            </h2>
-            <p className="text-white/70 mb-8 max-w-3xl">
-              Compensation varies significantly across industries. Below are average annual salary ranges for common industries, categorized by career stage.
-            </p>
-            
-            <div className="bg-navy-light/30 border border-white/10 rounded-lg p-6 mb-8">
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={industrySalaryData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-                    <XAxis dataKey="industry" stroke="#ffffff80" />
-                    <YAxis stroke="#ffffff80" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#1A1F2C", 
-                        borderColor: "#ffffff20",
-                        color: "#fff" 
-                      }} 
-                    />
-                    <Bar dataKey="entry" name="Entry Level" fill="#0EA5E9" />
-                    <Bar dataKey="mid" name="Mid Level" fill="#22D3EE" />
-                    <Bar dataKey="senior" name="Senior Level" fill="#06B6D4" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="w-4 h-4 bg-[#0EA5E9] rounded inline-block mr-2"></div>
-                  <span className="text-white/70 text-sm">Entry Level</span>
-                </div>
-                <div>
-                  <div className="w-4 h-4 bg-[#22D3EE] rounded inline-block mr-2"></div>
-                  <span className="text-white/70 text-sm">Mid Level</span>
-                </div>
-                <div>
-                  <div className="w-4 h-4 bg-[#06B6D4] rounded inline-block mr-2"></div>
-                  <span className="text-white/70 text-sm">Senior Level</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-navy-light/30 border border-white/10 rounded-lg p-6">
-                <h3 className="text-xl font-medium text-white mb-3">Entry-Level Insights</h3>
-                <p className="text-white/70 mb-4">
-                  Entry-level positions in technology offer the highest starting salaries, with an average of $65,000 annually.
-                </p>
-                <p className="text-white/70">
-                  When negotiating your first job offer, focus on growth potential and training opportunities if salary flexibility is limited.
-                </p>
-              </div>
-              
-              <div className="bg-navy-light/30 border border-white/10 rounded-lg p-6">
-                <h3 className="text-xl font-medium text-white mb-3">Mid-Career Analysis</h3>
-                <p className="text-white/70 mb-4">
-                  The largest salary growth typically occurs in the transition from entry to mid-level positions, with an average increase of 54%.
-                </p>
-                <p className="text-white/70">
-                  Mid-career professionals should negotiate based on their specialized skills and demonstrated impact.
-                </p>
-              </div>
-              
-              <div className="bg-navy-light/30 border border-white/10 rounded-lg p-6">
-                <h3 className="text-xl font-medium text-white mb-3">Senior Compensation</h3>
-                <p className="text-white/70 mb-4">
-                  Technology and Finance offer the highest senior-level compensation packages, often supplemented with equity and performance bonuses.
-                </p>
-                <p className="text-white/70">
-                  At senior levels, total compensation often includes significant non-salary components.
-                </p>
-              </div>
-            </div>
-          </section>
-          
-          {/* Location-Based Salary Section */}
-          <section className="mb-20">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Location-Based Salary Insights
-            </h2>
-            <p className="text-white/70 mb-8 max-w-3xl">
-              Geographic location significantly impacts salary levels, with major tech hubs and cities with high costs of living offering higher compensation.
-            </p>
-            
-            <div className="bg-navy-light/30 border border-white/10 rounded-lg p-6 mb-8">
-              <div className="h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={locationSalaryData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    layout="vertical"
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-                    <XAxis type="number" stroke="#ffffff80" />
-                    <YAxis dataKey="location" type="category" stroke="#ffffff80" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#1A1F2C", 
-                        borderColor: "#ffffff20",
-                        color: "#fff" 
-                      }}
-                      formatter={(value) => [`$${value.toLocaleString()}`, 'Average Salary']}
-                    />
-                    <Bar dataKey="salary" fill="#06B6D4" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-            
+
+          <form onSubmit={handleSubmit} className="mb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-r from-cyan/20 to-blue-500/20 border border-white/10 rounded-lg p-6">
-                <h3 className="text-xl font-medium text-white mb-3">Remote Work Impact</h3>
-                <p className="text-white/70 mb-4">
-                  With the rise of remote work, some companies are adopting location-based pay scales, while others offer standardized compensation regardless of location.
-                </p>
-                <ul className="space-y-2 text-white/70">
-                  <li className="flex items-start">
-                    <span className="text-cyan mr-2">•</span>
-                    <span>Location-based pay: Adjusted based on local cost of living</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-cyan mr-2">•</span>
-                    <span>National average pay: Same regardless of location</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-cyan mr-2">•</span>
-                    <span>Hybrid models: Base pay plus location adjustment</span>
-                  </li>
-                </ul>
+              <div>
+                <label
+                  htmlFor="jobTitle"
+                  className="block text-sm font-medium text-white/80 mb-2"
+                >
+                  Job Title
+                </label>
+                <input
+                  type="text"
+                  id="jobTitle"
+                  className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
+                  placeholder="e.g., Software Engineer"
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  required
+                />
               </div>
-              
-              <div className="bg-gradient-to-r from-cyan/20 to-blue-500/20 border border-white/10 rounded-lg p-6">
-                <h3 className="text-xl font-medium text-white mb-3">Relocation Considerations</h3>
-                <p className="text-white/70 mb-4">
-                  When evaluating job opportunities in different locations, consider these factors beyond the base salary:
-                </p>
-                <ul className="space-y-2 text-white/70">
-                  <li className="flex items-start">
-                    <span className="text-cyan mr-2">•</span>
-                    <span>Cost of living differences (housing, taxes, transportation)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-cyan mr-2">•</span>
-                    <span>Quality of life factors (commute times, amenities)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-cyan mr-2">•</span>
-                    <span>Career growth potential in the local market</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-cyan mr-2">•</span>
-                    <span>Relocation assistance and benefits</span>
-                  </li>
-                </ul>
+              <div>
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-white/80 mb-2"
+                >
+                  Location
+                </label>
+                <input
+                  type="text"
+                  id="location"
+                  className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
+                  placeholder="e.g., San Francisco, CA"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  required
+                />
               </div>
-            </div>
-          </section>
-          
-          {/* Job Title Salary Comparisons */}
-          <section className="mb-20">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Job Title Salary Comparisons
-            </h2>
-            <p className="text-white/70 mb-8 max-w-3xl">
-              Your job title significantly impacts your earning potential. Below we compare similar roles across different companies and industries.
-            </p>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-navy-light/50">
-                    <th className="border-b border-white/10 py-4 px-6 text-left text-white">Job Title</th>
-                    <th className="border-b border-white/10 py-4 px-6 text-left text-white">Entry Level</th>
-                    <th className="border-b border-white/10 py-4 px-6 text-left text-white">Mid Level</th>
-                    <th className="border-b border-white/10 py-4 px-6 text-left text-white">Senior Level</th>
-                    <th className="border-b border-white/10 py-4 px-6 text-left text-white">Key Skills</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="hover:bg-white/5">
-                    <td className="border-b border-white/10 py-4 px-6 text-white">Software Engineer</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$70,000 - $95,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$95,000 - $135,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$135,000 - $180,000+</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">JavaScript, Python, Cloud Services</td>
-                  </tr>
-                  <tr className="hover:bg-white/5">
-                    <td className="border-b border-white/10 py-4 px-6 text-white">UX/UI Designer</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$60,000 - $85,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$85,000 - $120,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$120,000 - $160,000+</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">Figma, User Research, Prototyping</td>
-                  </tr>
-                  <tr className="hover:bg-white/5">
-                    <td className="border-b border-white/10 py-4 px-6 text-white">Data Scientist</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$75,000 - $100,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$100,000 - $140,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$140,000 - $190,000+</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">Python, ML Algorithms, Big Data</td>
-                  </tr>
-                  <tr className="hover:bg-white/5">
-                    <td className="border-b border-white/10 py-4 px-6 text-white">Product Manager</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$70,000 - $95,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$95,000 - $140,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$140,000 - $200,000+</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">Roadmapping, Market Analysis, Agile</td>
-                  </tr>
-                  <tr className="hover:bg-white/5">
-                    <td className="border-b border-white/10 py-4 px-6 text-white">Marketing Manager</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$55,000 - $80,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$80,000 - $120,000</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">$120,000 - $160,000+</td>
-                    <td className="border-b border-white/10 py-4 px-6 text-white/70">Digital Marketing, Analytics, SEO</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-          
-          {/* Real-time Market Trends */}
-          <section>
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Real-time Market Trends
-            </h2>
-            <p className="text-white/70 mb-8 max-w-3xl">
-              Tracking salary growth over time helps contextualize offers and provides insights for future negotiations. The chart below shows salary growth rates indexed to 2018 baseline (1.0).
-            </p>
-            
-            <div className="bg-navy-light/30 border border-white/10 rounded-lg p-6 mb-8">
-              <div className="h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={marketTrendsData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-                    <XAxis dataKey="year" stroke="#ffffff80" />
-                    <YAxis stroke="#ffffff80" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#1A1F2C", 
-                        borderColor: "#ffffff20",
-                        color: "#fff" 
-                      }}
-                      formatter={(value) => [`${value.toFixed(2)}x`, 'Growth Rate']}
-                    />
-                    <Line type="monotone" dataKey="rate" stroke="#06B6D4" strokeWidth={3} dot={{ r: 6 }} />
-                  </LineChart>
-                </ResponsiveContainer>
+              <div>
+                <label
+                  htmlFor="experienceLevel"
+                  className="block text-sm font-medium text-white/80 mb-2"
+                >
+                  Experience Level
+                </label>
+                <select
+                  id="experienceLevel"
+                  className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
+                  value={experienceLevel}
+                  onChange={(e) => setExperienceLevel(e.target.value)}
+                  required
+                >
+                  <option value="">Select Experience Level</option>
+                  <option value="Entry Level">Entry Level</option>
+                  <option value="Mid Level">Mid Level</option>
+                  <option value="Senior Level">Senior Level</option>
+                </select>
+              </div>
+              <div>
+                <button
+                  type="submit"
+                  className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-cyan to-blue-500 text-white font-semibold hover:opacity-90 transition-all"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "Get Salary Data"}
+                </button>
               </div>
             </div>
-            
-            <div className="bg-cyan/10 border border-cyan/30 rounded-lg p-6">
-              <h3 className="text-xl font-medium text-white mb-4">Key Trends to Watch</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-2">Growing Demand</h4>
-                  <ul className="space-y-2 text-white/70">
-                    <li className="flex items-start">
-                      <span className="text-cyan mr-2">•</span>
-                      <span>AI and Machine Learning roles (18% YoY growth)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan mr-2">•</span>
-                      <span>Cybersecurity specialists (15% YoY growth)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan mr-2">•</span>
-                      <span>Cloud architects (14% YoY growth)</span>
-                    </li>
-                  </ul>
+          </form>
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+              {error}
+            </div>
+          )}
+
+          {salaryData && !showComparison && (
+            <div className="glass-card p-6 rounded-lg mb-8">
+              <h2 className="text-2xl font-bold text-white mb-4">
+                Salary Insights for {salaryData.jobTitle} in {salaryData.location}
+              </h2>
+              <p className="text-white/70 mb-2">
+                Experience Level: {salaryData.experienceLevel}
+              </p>
+              <p className="text-white/70 mb-2">
+                Average Salary: ${salaryData.averageSalary.toLocaleString()}
+              </p>
+              <p className="text-white/70 mb-4">
+                Salary Range: $
+                {salaryData.salaryRange[0].toLocaleString()} - $
+                {salaryData.salaryRange[1].toLocaleString()}
+              </p>
+              <p className="text-white/70 mb-4">
+                Estimated Job Openings: {salaryData.jobOpenings}
+              </p>
+              <p className="text-white/70">
+                Required Skills: {salaryData.skills.join(", ")}
+              </p>
+                <button
+                    onClick={handleCompare}
+                    className="mt-4 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan to-blue-500 text-white font-semibold hover:opacity-90 transition-all"
+                    disabled={isLoading}
+                >
+                    Compare to Other Locations
+                </button>
+            </div>
+          )}
+
+            {showComparison && (
+                <div className="glass-card p-6 rounded-lg mb-8">
+                    <h2 className="text-2xl font-bold text-white mb-4">
+                        Salary Comparison for {jobTitle} ({experienceLevel})
+                    </h2>
+                    {comparisonData.map((data, index) => (
+                        <div key={index} className="mb-4 p-4 border border-white/10 rounded-md">
+                            <h3 className="text-xl font-semibold text-white">{data.location}</h3>
+                            <p className="text-white/70 mb-2">
+                                Average Salary: ${data.averageSalary.toLocaleString()}
+                            </p>
+                            <p className="text-white/70 mb-2">
+                                Salary Range: ${data.salaryRange[0].toLocaleString()} - ${data.salaryRange[1].toLocaleString()}
+                            </p>
+                            <p className="text-white/70">
+                                Estimated Job Openings: {data.jobOpenings}
+                            </p>
+                        </div>
+                    ))}
                 </div>
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-2">Emerging Benefits</h4>
-                  <ul className="space-y-2 text-white/70">
-                    <li className="flex items-start">
-                      <span className="text-cyan mr-2">•</span>
-                      <span>Four-day workweeks</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan mr-2">•</span>
-                      <span>Enhanced mental health coverage</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan mr-2">•</span>
-                      <span>Professional development stipends</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+            )}
+
+          {chartData.labels.length > 0 && (
+            <div className="glass-card p-6 rounded-lg">
+              <h2 className="text-2xl font-bold text-white mb-4">
+                Salary Chart
+              </h2>
+              <Bar data={chartData} />
+                {showComparison && (
+                    <div className="mt-4">
+                        <p className="text-white/70">
+                            The chart compares the average salaries for the specified job title and experience level across different locations.
+                        </p>
+                        <ul className="list-disc pl-5 mt-2 text-white/70">
+                            {comparisonData.map((data, index) => (
+                                <li key={index}>
+                                    <strong>{data.location}:</strong> Average Salary - ${typeof data.averageSalary === 'number' ? data.averageSalary.toFixed(0) : data.averageSalary}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
-          </section>
+          )}
+
+          <div className="mt-16 bg-gradient-to-r from-cyan/20 to-blue-500/20 border border-white/10 rounded-lg p-8 text-center">
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Ready to Negotiate Your Salary?
+            </h2>
+            <p className="text-white/70 mb-6 max-w-md mx-auto">
+              Get personalized negotiation strategies and insights to maximize
+              your earning potential.
+            </p>
+            <Link
+              to="/#analyze"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-md bg-gradient-to-r from-cyan to-blue-500 text-white hover:opacity-90 transition-opacity"
+            >
+              Analyze Your Offer
+            </Link>
+          </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
