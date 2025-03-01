@@ -17,6 +17,8 @@ export const useAnalysisForm = () => {
     setIsSaving,
     analysisResults,
     setAnalysisResults,
+    analysisError,
+    setAnalysisError,
     sampleData,
     handleChange
   } = useAnalysisState();
@@ -50,6 +52,7 @@ export const useAnalysisForm = () => {
     isAnalyzing,
     isSaving,
     analysisResults,
+    analysisError,
     sampleData,
     handleChange,
     handleSubmit,

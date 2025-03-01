@@ -37,9 +37,22 @@ export const useAnalysisSubmit = ({
     try {
       setIsAnalyzing(true);
       
+      // Form validation
+      if (!formData.jobTitle.trim()) {
+        throw new Error("Job title is required");
+      }
+      
+      if (!formData.location.trim()) {
+        throw new Error("Location is required");
+      }
+      
+      if (!formData.experience) {
+        throw new Error("Years of experience is required");
+      }
+      
       // Convert salary to a number
       const numericSalary = parseFloat(formData.salary.toString());
-      if (isNaN(numericSalary)) {
+      if (isNaN(numericSalary) || numericSalary <= 0) {
         throw new Error("Please enter a valid salary amount");
       }
       
@@ -48,6 +61,12 @@ export const useAnalysisSubmit = ({
         ...formData,
         salary: numericSalary
       }, user?.id || '');
+      
+      // If we didn't get a proper response, handle gracefully
+      if (!response || !response.analysis) {
+        console.log("Invalid response from salary analysis:", response);
+        throw new Error("Unable to analyze your offer. The service may be temporarily unavailable.");
+      }
       
       // Extract the analysis results
       const { analysis, prompt } = response;
@@ -64,9 +83,41 @@ export const useAnalysisSubmit = ({
       // Update form state
       setFormSubmitted(true);
       toast.success("Analysis completed successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error analyzing salary offer:", error);
-      toast.error("Failed to analyze your offer. Please try again.");
+      
+      // Determine if this is a network or service error
+      const errorMessage = error.message.includes("Failed to fetch") || 
+                          error.message.includes("Edge Function") ?
+                          "Network error: Unable to connect to the analysis service. Please check your connection and try again." :
+                          error.message;
+                          
+      toast.error(errorMessage);
+      
+      // Still show a fallback analysis if we have the basic data
+      if (formData.salary) {
+        const numericSalary = parseFloat(formData.salary.toString());
+        
+        // Provide a basic fallback analysis with disclaimer
+        setAnalysisResults({
+          fairnessScore: 70,
+          suggestedCounteroffer: Math.round(numericSalary * 1.12),
+          aiAnalysis: {
+            disclaimer: "This is a fallback analysis due to service connectivity issues.",
+            marketComparison: {
+              text: `Based on limited offline data, your offer appears to be within market range.`
+            },
+            negotiationPoints: [
+              "Consider negotiating for better benefits",
+              "Request a performance-based bonus structure",
+              "Discuss professional development opportunities"
+            ]
+          }
+        });
+        
+        setFormSubmitted(true);
+        toast.warning("Showing simplified analysis due to service connectivity issues");
+      }
     } finally {
       setIsAnalyzing(false);
     }

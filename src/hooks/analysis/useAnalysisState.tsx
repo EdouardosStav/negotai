@@ -25,6 +25,9 @@ export const useAnalysisState = () => {
     aiAnalysis?: any;
   } | null>(null);
   
+  // Error state
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  
   // Sample data for the preview panel
   const sampleData = {
     jobTitle: "Senior Software Engineer",
@@ -56,6 +59,8 @@ export const useAnalysisState = () => {
     setIsSaving,
     analysisResults,
     setAnalysisResults,
+    analysisError,
+    setAnalysisError,
     sampleData,
     handleChange
   };
