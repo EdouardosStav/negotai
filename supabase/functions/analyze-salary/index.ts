@@ -1,14 +1,17 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.24.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.36.0";
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+// Environment variables
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+// Create Supabase client
+const supabase = createClient(supabaseUrl, supabaseKey);
 
+// CORS headers for browser requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -21,186 +24,75 @@ serve(async (req) => {
   }
 
   try {
-    // Extract the request body
+    // Parse request body
     const { salaryData, userId } = await req.json();
+    console.log("Received salary analysis request:", salaryData);
 
-    if (!OPENAI_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: 'OpenAI API key is not configured' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+    if (!openAIApiKey) {
+      console.error("OpenAI API key is not configured");
+      throw new Error("OpenAI API key is not configured");
     }
 
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: 'User ID is required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Construct the prompt for OpenAI
-    const prompt = constructPrompt(salaryData);
-    
-    console.log('Sending prompt to OpenAI:', prompt);
+    // Prepare the prompt for OpenAI
+    const prompt = buildPromptFromSalaryData(salaryData);
+    console.log("Generated prompt:", prompt);
 
     // Call OpenAI API
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o-mini', // Using a cheaper model for cost-effectiveness
         messages: [
           {
             role: 'system',
-            content: `You are an AI salary analysis expert. Your task is to analyze job offers and provide insights about their fairness and negotiation advice.
-            
-            Your response MUST be in the following JSON format:
-            {
-              "companySpecific": {
-                "text": "Your analysis of how this offer compares with similar positions at this company",
-                "percentage": "How much above/below average for this company (e.g., 75% above average)"
-              },
-              "marketComparison": {
-                "text": "Your analysis of how this salary compares to the industry benchmark",
-                "percentage": "How much above/below market average (e.g., 10% below average)"
-              },
-              "benefitsAssessment": {
-                "text": "Your assessment of the benefits package",
-                "rating": "One of: Below Average, At Industry Standard, Above Average"
-              },
-              "bonusAndEquity": {
-                "text": "Your analysis of bonus structure and equity compared to industry norms"
-              },
-              "growthPotential": {
-                "text": "Your assessment of potential for growth and future salary increases"
-              },
-              "fairnessScore": "A numerical score from 0-100 indicating how fair the offer is",
-              "suggestedCounteroffer": "A numerical value suggesting what the user should counter with",
-              "negotiationPoints": [
-                "List of 3-4 specific negotiation recommendations"
-              ]
-            }
-            
-            Your response should be data-backed and specific to the job details provided. Use your knowledge of salary ranges for different roles, locations, and experience levels. Your goal is to help job seekers understand if their offers are competitive and how to negotiate better terms.`
+            content: 'You are an expert in salary negotiation and job market analysis. Analyze the provided salary offer details and provide a structured report with a fairness score (0-100), suggested counteroffer, and detailed sections on market comparison, company specifics, benefits assessment, bonus structure, growth potential, and negotiation points.'
           },
-          {
-            role: 'user',
-            content: prompt
-          }
+          { role: 'user', content: prompt }
         ],
         temperature: 0.7,
-        max_tokens: 1200,
       }),
     });
 
-    const openAIData = await openAIResponse.json();
-    
-    if (!openAIData.choices || openAIData.choices.length === 0) {
-      console.error('Unexpected OpenAI response:', openAIData);
-      return new Response(
-        JSON.stringify({ error: 'Failed to get a valid response from OpenAI API' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("OpenAI API Error:", errorData);
+      throw new Error(`OpenAI API Error: ${errorData?.error?.message || 'Unknown error'}`);
     }
 
-    // Extract and parse the OpenAI response
-    const aiResponseText = openAIData.choices[0].message.content.trim();
-    console.log('Raw OpenAI response:', aiResponseText);
-    
-    let aiAnalysis;
-    try {
-      // Try to parse the JSON response
-      aiAnalysis = JSON.parse(aiResponseText);
-      
-      // Calculate the suggested counteroffer if it's not a number
-      if (typeof aiAnalysis.suggestedCounteroffer === 'string') {
-        const numericValue = parseFloat(aiAnalysis.suggestedCounteroffer.replace(/[^0-9.]/g, ''));
-        if (!isNaN(numericValue)) {
-          aiAnalysis.suggestedCounteroffer = numericValue;
-        } else {
-          // Fallback: calculate 10% increase if we can't parse the number
-          const offeredSalary = parseFloat(salaryData.salary);
-          aiAnalysis.suggestedCounteroffer = Math.round(offeredSalary * 1.1);
-        }
-      }
-      
-      // Make sure fairnessScore is a number
-      if (typeof aiAnalysis.fairnessScore === 'string') {
-        const scoreValue = parseInt(aiAnalysis.fairnessScore.replace(/[^0-9]/g, ''));
-        if (!isNaN(scoreValue)) {
-          aiAnalysis.fairnessScore = scoreValue;
-        } else {
-          aiAnalysis.fairnessScore = 70; // Default value
-        }
-      }
-    } catch (error) {
-      console.error('Error parsing AI response:', error);
-      // If parsing fails, create a default structure
-      aiAnalysis = {
-        companySpecific: {
-          text: "We couldn't analyze this company specifically due to limited data.",
-          percentage: "Unknown"
-        },
-        marketComparison: {
-          text: "Based on industry standards, your offer appears competitive for your role and location.",
-          percentage: "Competitive"
-        },
-        benefitsAssessment: {
-          text: "Your benefits package appears to align with industry standards.",
-          rating: "At Industry Standard"
-        },
-        bonusAndEquity: {
-          text: "Your bonus structure is in line with similar positions in your field."
-        },
-        growthPotential: {
-          text: "This role has a typical growth trajectory for your industry and level."
-        },
-        fairnessScore: 75,
-        suggestedCounteroffer: Math.round(parseFloat(salaryData.salary) * 1.1),
-        negotiationPoints: [
-          "Request additional PTO days",
-          "Negotiate for a performance review after 6 months",
-          "Ask about professional development budget",
-          "Inquire about flexible work arrangements"
-        ]
-      };
-    }
+    // Parse OpenAI response
+    const data = await response.json();
+    const aiResponse = data.choices[0].message.content;
+    console.log("Received AI response:", aiResponse);
 
-    return new Response(
-      JSON.stringify({ 
-        analysis: aiAnalysis,
-        prompt: prompt
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    // Parse the AI response to extract structured data
+    const analysis = parseAnalysisFromAI(aiResponse, salaryData);
+
+    // Return the analysis data
+    return new Response(JSON.stringify({ 
+      analysis, 
+      prompt 
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error in analyze-salary function:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      errorDetails: error.stack
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
 
-// Function to construct the prompt for OpenAI based on the salary data
-function constructPrompt(data) {
+// Function to build the prompt from salary data
+function buildPromptFromSalaryData(salaryData) {
   const {
     jobTitle,
     companyName,
@@ -209,49 +101,123 @@ function constructPrompt(data) {
     experience,
     location,
     salary,
-    benefitsPackage
-  } = data;
+    benefitsPackage,
+  } = salaryData;
 
-  const formattedSalary = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  }).format(parseFloat(salary));
+  return `
+Please analyze this job offer:
 
-  let prompt = `I need an analysis of a job offer with the following details:
+Job Title: ${jobTitle}
+${companyName ? `Company: ${companyName}` : ''}
+Job Level: ${jobLevel || 'Not specified'}
+Employment Type: ${employmentType || 'Full-Time'}
+Years of Experience: ${experience || 'Not specified'}
+Location: ${location}
+Salary Offered: $${salary}
+${benefitsPackage ? `Benefits Package: ${benefitsPackage}` : 'No benefits information provided'}
 
-Job Information:
-- Job Title: ${jobTitle}
-- Employment Type: ${employmentType}
-- Experience Level: ${experience}
-- Location: ${location}`;
+Please provide a detailed analysis with:
+1. Fairness Score (0-100)
+2. Suggested Counteroffer
+3. Market Comparison
+4. Company-Specific Analysis
+5. Benefits Assessment
+6. Bonus and Equity Potential
+7. Growth Potential
+8. Negotiation Points (list of 4-5 specific points)
 
-  if (companyName) {
-    prompt += `\n- Company Name: ${companyName}`;
+Format your response as structured text that can be easily parsed.
+`;
+}
+
+// Function to parse the AI response into structured data
+function parseAnalysisFromAI(aiResponse, salaryData) {
+  try {
+    // Attempt to extract a fairness score (0-100)
+    let fairnessScore = 75; // Default score
+    const fairnessMatch = aiResponse.match(/Fairness Score:?\s*(\d+)/i);
+    if (fairnessMatch && fairnessMatch[1]) {
+      fairnessScore = parseInt(fairnessMatch[1]);
+      // Ensure score is within bounds
+      fairnessScore = Math.min(100, Math.max(0, fairnessScore));
+    }
+    
+    // Extract suggested counteroffer
+    const numericSalary = parseFloat(salaryData.salary.toString());
+    let suggestedCounteroffer = Math.round(numericSalary * 1.1); // Default 10% increase
+    const counterofferMatch = aiResponse.match(/Suggested Counteroffer:?\s*\$?([0-9,]+)/i);
+    if (counterofferMatch && counterofferMatch[1]) {
+      suggestedCounteroffer = parseInt(counterofferMatch[1].replace(/,/g, ''));
+    }
+    
+    // Extract other sections
+    function extractSection(sectionName) {
+      const regex = new RegExp(`${sectionName}:?\\s*([\\s\\S]*?)(?=\\n\\s*\\d+\\.|\\n\\s*[A-Z][a-z]+\\s*:|$)`, 'i');
+      const match = aiResponse.match(regex);
+      return match ? match[1].trim() : '';
+    }
+    
+    // Extract negotiation points as array
+    const negotiationPointsSection = extractSection('Negotiation Points');
+    const negotiationPoints = negotiationPointsSection
+      .split('\n')
+      .map(point => point.replace(/^-|\d+\.\s*/, '').trim())
+      .filter(point => point.length > 0)
+      .slice(0, 5); // Limit to 5 points
+    
+    // If no points were extracted, provide default ones
+    if (negotiationPoints.length === 0) {
+      negotiationPoints.push(
+        "Consider negotiating for better benefits coverage",
+        "Request a performance-based bonus structure",
+        "Discuss professional development opportunities and budget",
+        "Inquire about flexible working arrangements"
+      );
+    }
+    
+    return {
+      fairnessScore: fairnessScore,
+      suggestedCounteroffer: suggestedCounteroffer,
+      marketComparison: {
+        text: extractSection('Market Comparison') || 
+              `Based on market research, this offer for ${salaryData.jobTitle} in ${salaryData.location} appears to be within range.`
+      },
+      companySpecific: {
+        text: extractSection('Company-Specific Analysis') || 
+              `Analysis for ${salaryData.companyName || 'the company'} indicates this offer is competitive for a ${salaryData.jobLevel} ${salaryData.jobTitle}.`
+      },
+      benefitsAssessment: {
+        text: extractSection('Benefits Assessment') || 
+              (salaryData.benefitsPackage ? 
+                `Your benefits package appears to be at industry standard, including: ${salaryData.benefitsPackage}` : 
+                `No benefits package information provided for assessment.`)
+      },
+      bonusAndEquity: {
+        text: extractSection('Bonus and Equity Potential') || 
+              `Performance bonuses for ${salaryData.jobLevel} roles typically range from 8-10% of base salary.`
+      },
+      growthPotential: {
+        text: extractSection('Growth Potential') || 
+              `Salary growth trajectory aligns with industry standards for ${salaryData.employmentType} positions.`
+      },
+      negotiationPoints: negotiationPoints
+    };
+  } catch (error) {
+    console.error("Error parsing AI response:", error);
+    // Return a simplified fallback structure
+    return {
+      fairnessScore: 75,
+      suggestedCounteroffer: Math.round(parseFloat(salaryData.salary.toString()) * 1.1),
+      marketComparison: { text: "Analysis based on offline data due to parsing issues." },
+      companySpecific: { text: "Company-specific data not available." },
+      benefitsAssessment: { text: "Benefits assessment not available." },
+      bonusAndEquity: { text: "Bonus and equity information not available." },
+      growthPotential: { text: "Growth potential information not available." },
+      negotiationPoints: [
+        "Consider negotiating for better benefits",
+        "Request a performance-based bonus structure",
+        "Discuss professional development opportunities"
+      ]
+    };
   }
-  
-  if (jobLevel) {
-    prompt += `\n- Job Level: ${jobLevel}`;
-  }
-
-  prompt += `\n\nCompensation Details:
-- Offered Salary: ${formattedSalary} USD`;
-
-  if (benefitsPackage) {
-    prompt += `\n- Benefits Package: ${benefitsPackage}`;
-  }
-
-  prompt += `\n\nPlease analyze this offer and provide insights on:
-1. How this offer compares to similar positions at this company (if known)
-2. How the salary compares to the industry benchmark for this role, experience level, and location
-3. Assessment of the benefits package compared to industry standards
-4. Analysis of the bonus structure and equity (if applicable)
-5. Evaluation of growth potential and future salary increase opportunities
-6. A fairness score (0-100) for this offer
-7. A suggested counteroffer amount in USD
-8. 3-4 specific negotiation points
-
-Enhance your analysis with data from sources like LinkedIn Salary Insights, Glassdoor, and Payscale to provide accurate market comparisons.`;
-
-  return prompt;
 }

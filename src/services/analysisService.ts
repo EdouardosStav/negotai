@@ -28,7 +28,7 @@ export const analyzeSalaryOffer = async (data: SalaryAnalysisInput, userId: stri
       return generateFallbackAnalysis(data);
     }
 
-    console.log("Analysis completed successfully:", response);
+    console.log("Analysis completed successfully:", response.analysis);
     return response;
   } catch (error: any) {
     console.error('Error in analyzeSalaryOffer:', error);
