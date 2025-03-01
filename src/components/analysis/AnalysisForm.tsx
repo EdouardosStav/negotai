@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Loader2, Building, DollarSign, Gift } from "lucide-react";
-import { SalaryAnalysisInput } from "@/services/analysisService";
+import { SalaryAnalysisInput } from "@/services/types/analysisTypes";
 
 interface AnalysisFormProps {
   formData: SalaryAnalysisInput;
@@ -51,7 +51,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
                 type="text" 
                 id="companyName" 
                 name="companyName" 
-                value={formData.companyName} 
+                value={formData.companyName || ''} 
                 onChange={handleChange} 
                 placeholder="TechCorp Inc." 
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
@@ -67,7 +67,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
               <select 
                 id="jobLevel" 
                 name="jobLevel" 
-                value={formData.jobLevel} 
+                value={formData.jobLevel || ''} 
                 onChange={handleChange} 
                 className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
               >
@@ -173,7 +173,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
               <textarea 
                 id="benefitsPackage" 
                 name="benefitsPackage" 
-                value={formData.benefitsPackage} 
+                value={formData.benefitsPackage || ''} 
                 onChange={handleChange} 
                 placeholder="Health Insurance Premium Plan, 2% Equity, 8% Performance Bonus, Hybrid Work (3 days in office), 15 PTO days" 
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all resize-none h-24" 

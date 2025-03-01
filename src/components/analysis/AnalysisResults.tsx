@@ -1,37 +1,60 @@
 
 import React from "react";
 import { Building, CheckCircle, Gift, Award, Clock, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { SalaryAnalysisInput } from "@/services/types/analysisTypes";
+import { Database } from "@/integrations/supabase/client";
+
+type SalaryAnalysis = Database['public']['Tables']['salary_analyses']['Row'];
 
 interface AnalysisResultsProps {
-  formData: {
+  // We'll support both formData and analysis for different contexts
+  formData?: {
     jobTitle: string;
-    companyName: string;
-    jobLevel: string;
+    companyName?: string;
+    jobLevel?: string;
     employmentType: string;
     experience: string;
     location: string;
     salary: string;
-    benefitsPackage: string;
+    benefitsPackage?: string;
   };
-  analysisResults: {
+  analysis?: SalaryAnalysis;
+  analysisResults?: {
     fairnessScore: number;
     suggestedCounteroffer: number;
   };
-  handleSaveAnalysis: () => void;
-  redirectToAuth: () => void;
-  isSaving: boolean;
+  handleSaveAnalysis?: () => void;
+  redirectToAuth?: () => void;
+  isSaving?: boolean;
+  isUpdatingStatus?: boolean;
+  onStatusChange?: (newStatus: string) => void;
 }
 
 const AnalysisResults: React.FC<AnalysisResultsProps> = ({ 
   formData,
+  analysis,
   analysisResults,
   handleSaveAnalysis,
   redirectToAuth,
-  isSaving
+  isSaving,
+  isUpdatingStatus,
+  onStatusChange
 }) => {
   const { isAuthenticated } = useAuth();
+  
+  // Handle both formData and analysis prop patterns
+  const jobTitle = formData?.jobTitle || analysis?.job_title || '';
+  const companyName = formData?.companyName || analysis?.company_name || '';
+  const jobLevel = formData?.jobLevel || analysis?.job_level || 'Senior';
+  const employmentType = formData?.employmentType || analysis?.employment_type || 'Full-Time';
+  const location = formData?.location || analysis?.location || '';
+  const benefitsPackage = formData?.benefitsPackage || analysis?.benefits_package || '';
+  
+  // Determine scores based on which props are passed
+  const fairnessScore = analysisResults?.fairnessScore || 80;
+  const suggestedCounteroffer = analysisResults?.suggestedCounteroffer || 
+    (analysis ? Math.round(analysis.offered_salary * 1.12) : 0);
 
   return (
     <div className="animate-fade-in">
@@ -45,12 +68,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       <div className="mb-6">
         <div className="flex justify-between mb-2">
           <span className="text-white/80">Fairness Score</span>
-          <span className="text-amber-400 font-medium">{analysisResults.fairnessScore}%</span>
+          <span className="text-amber-400 font-medium">{fairnessScore}%</span>
         </div>
         <div className="w-full bg-white/10 rounded-full h-2">
           <div 
             className="bg-gradient-to-r from-amber-500 to-green-500 h-2 rounded-full" 
-            style={{ width: `${analysisResults.fairnessScore}%` }}
+            style={{ width: `${fairnessScore}%` }}
           ></div>
         </div>
         <p className="text-white/70 text-xs mt-2">
@@ -59,12 +82,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       </div>
       
       <div className="space-y-4 mb-6">
-        {formData.companyName && (
+        {companyName && (
           <div className="flex items-start gap-3">
             <Building className="text-cyan mt-1 flex-shrink-0" size={18} />
             <p className="text-white/80 text-sm">
               <span className="font-medium text-white block mb-1">Company Specific</span>
-              Your offer is 75% above average for {formData.jobLevel || "Senior"} {formData.jobTitle} roles at {formData.companyName}
+              Your offer is 75% above average for {jobLevel} {jobTitle} roles at {companyName}
             </p>
           </div>
         )}
@@ -73,11 +96,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <CheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
           <p className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Competitive Base Salary</span>
-            Your offer is 70% above industry average for {formData.jobLevel || "Senior"} {formData.jobTitle} roles in {formData.location}
+            Your offer is 70% above industry average for {jobLevel} {jobTitle} roles in {location}
           </p>
         </div>
         
-        {formData.benefitsPackage && (
+        {benefitsPackage && (
           <div className="flex items-start gap-3">
             <Gift className="text-amber-400 mt-1 flex-shrink-0" size={18} />
             <p className="text-white/80 text-sm">
@@ -91,7 +114,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <Award className="text-amber-400 mt-1 flex-shrink-0" size={18} />
           <p className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Bonus & Stock Potential</span>
-            Your 8% performance bonus is slightly below the 10% industry average for {formData.jobLevel || "Senior"} roles.
+            Your 8% performance bonus is slightly below the 10% industry average for {jobLevel} roles.
           </p>
         </div>
         
@@ -99,7 +122,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <Clock className="text-success mt-1 flex-shrink-0" size={18} />
           <p className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Growth Potential</span>
-            Salary growth trajectory aligns with industry standards for {formData.employmentType} positions
+            Salary growth trajectory aligns with industry standards for {employmentType} positions
           </p>
         </div>
       </div>
@@ -109,7 +132,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <span className="font-medium text-white">Suggested Counter-Offer:</span>
         </p>
         <p className="text-2xl font-bold text-gradient">
-          ${analysisResults.suggestedCounteroffer.toLocaleString()}
+          ${suggestedCounteroffer.toLocaleString()}
         </p>
         <p className="text-white/70 text-xs mt-1">
           12% increase with strong justification based on market data
@@ -124,7 +147,13 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         </div>
       </div>
       
-      {isAuthenticated ? (
+      {analysis && onStatusChange ? (
+        // Rendering for AnalysisDetail page (with status update controls)
+        <div className="mt-6">
+          {/* Status update controls would go here */}
+        </div>
+      ) : isAuthenticated && handleSaveAnalysis ? (
+        // Rendering for saving analysis
         <button
           onClick={handleSaveAnalysis}
           className="w-full mt-6 py-2.5 px-4 rounded-lg bg-gradient-to-r from-primary/80 to-primary text-white hover:from-primary hover:to-primary/80 transition-all duration-300 text-sm"
@@ -139,7 +168,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             "Save Analysis to Dashboard"
           )}
         </button>
-      ) : (
+      ) : redirectToAuth && (
+        // Rendering for unauthenticated users
         <button
           onClick={redirectToAuth}
           className="w-full mt-6 py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 text-sm"
