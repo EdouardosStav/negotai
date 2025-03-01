@@ -1,3 +1,4 @@
+
 import { SalaryAnalysisInput, AnalysisMeta } from "./types/analysisTypes";
 import { saveSalaryAnalysis } from "./operations/createAnalysis";
 import { getSalaryAnalysisById, getUserAnalyses } from "./operations/readAnalysis";

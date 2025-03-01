@@ -50,6 +50,15 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   
   // Get AI analysis data
   const aiAnalysis = analysisResults?.aiAnalysis || analysis?.ai_analysis || null;
+  
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
 
   return (
     <div className="animate-fade-in">
@@ -67,13 +76,17 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         </div>
         <div className="w-full bg-white/10 rounded-full h-2">
           <div 
-            className="bg-gradient-to-r from-amber-500 to-green-500 h-2 rounded-full" 
+            className={`h-2 rounded-full ${fairnessScore < 60 
+              ? 'bg-red-500' 
+              : fairnessScore < 80 
+                ? 'bg-amber-500'
+                : 'bg-green-500'}`}
             style={{ width: `${fairnessScore}%` }}
           ></div>
         </div>
-        <p className="text-white/70 text-xs mt-2">
+        <p className="text-white/70 text-sm mt-2">
           {aiAnalysis?.marketComparison?.text || 
-           "Your offer is well above market value considering your job level and benefits package."}
+           `Your offer is ${fairnessScore < 80 ? 'below' : 'above'} market value for ${jobLevel} ${jobTitle} roles in ${location}.`}
         </p>
       </div>
       
@@ -81,50 +94,50 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         {companyName && (
           <div className="flex items-start gap-3">
             <Building className="text-cyan mt-1 flex-shrink-0" size={18} />
-            <p className="text-white/80 text-sm">
+            <div className="text-white/80 text-sm">
               <span className="font-medium text-white block mb-1">Company Specific</span>
-              {aiAnalysis?.companySpecific?.text || 
-               `Your offer is 75% above average for ${jobLevel} ${jobTitle} roles at ${companyName}`}
-            </p>
+              <p>{aiAnalysis?.companySpecific?.text || 
+                 `${companyName} is known for offering competitive compensation for ${jobLevel} ${jobTitle} roles.`}</p>
+            </div>
           </div>
         )}
         
         <div className="flex items-start gap-3">
-          <CheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-          <p className="text-white/80 text-sm">
+          <CheckCircle className={`${fairnessScore >= 80 ? 'text-success' : 'text-amber-400'} mt-1 flex-shrink-0`} size={18} />
+          <div className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Competitive Base Salary</span>
-            {aiAnalysis?.marketComparison?.text || 
-             `Your offer is 70% above industry average for ${jobLevel} ${jobTitle} roles in ${location}`}
-          </p>
+            <p>{aiAnalysis?.marketComparison?.text || 
+               `The average salary for this role in ${location} ranges between $${Math.round((suggestedCounteroffer * 0.9)/1000)}k-$${Math.round((suggestedCounteroffer * 1.1)/1000)}k.`}</p>
+          </div>
         </div>
         
         {(benefitsPackage || aiAnalysis?.benefitsAssessment) && (
           <div className="flex items-start gap-3">
             <Gift className="text-amber-400 mt-1 flex-shrink-0" size={18} />
-            <p className="text-white/80 text-sm">
+            <div className="text-white/80 text-sm">
               <span className="font-medium text-white block mb-1">Benefits Assessment</span>
-              {aiAnalysis?.benefitsAssessment?.text || 
-               `Your benefits package is <span className="text-amber-400 font-medium">At Industry Standard</span>. Your equity offer (2%) is competitive, but your PTO (15 days) is below the average of 20 days for your level.`}
-            </p>
+              <p>{aiAnalysis?.benefitsAssessment?.text || 
+                 `Based on the provided benefits information, your package is ${fairnessScore >= 80 ? 'competitive' : 'below industry standards'}.`}</p>
+            </div>
           </div>
         )}
         
         <div className="flex items-start gap-3">
           <Award className="text-amber-400 mt-1 flex-shrink-0" size={18} />
-          <p className="text-white/80 text-sm">
+          <div className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Bonus & Stock Potential</span>
-            {aiAnalysis?.bonusAndEquity?.text || 
-             `Your 8% performance bonus is slightly below the 10% industry average for ${jobLevel} roles.`}
-          </p>
+            <p>{aiAnalysis?.bonusAndEquity?.text || 
+               `Performance bonuses for similar roles typically range from 8-10% of base salary. Inquire about equity options if available.`}</p>
+          </div>
         </div>
         
         <div className="flex items-start gap-3">
           <Clock className="text-success mt-1 flex-shrink-0" size={18} />
-          <p className="text-white/80 text-sm">
+          <div className="text-white/80 text-sm">
             <span className="font-medium text-white block mb-1">Growth Potential</span>
-            {aiAnalysis?.growthPotential?.text || 
-             `Salary growth trajectory aligns with industry standards for ${employmentType} positions`}
-          </p>
+            <p>{aiAnalysis?.growthPotential?.text || 
+               `Career growth for ${jobLevel} ${jobTitle} roles typically includes advancement opportunities within 1-2 years.`}</p>
+          </div>
         </div>
       </div>
       
@@ -133,24 +146,37 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           <span className="font-medium text-white">Suggested Counter-Offer:</span>
         </p>
         <p className="text-2xl font-bold text-gradient">
-          ${suggestedCounteroffer.toLocaleString()}
+          {formatCurrency(suggestedCounteroffer)}
         </p>
         <p className="text-white/70 text-xs mt-1">
-          {fairnessScore < 70 ? "Increase recommended with strong justification based on market data" : 
-          "This is a competitive offer, but some increase may be possible"}
+          {fairnessScore < 70 
+            ? `${Math.round((suggestedCounteroffer / (formData?.salary || analysis?.offered_salary || 100000) - 1) * 100)}% increase based on market averages` 
+            : "This is a competitive offer, but some increase may be possible"}
         </p>
         <div className="mt-3 pt-3 border-t border-white/10">
           <p className="text-sm text-white mb-2">Additional negotiation points:</p>
           <ul className="text-xs text-white/70 space-y-1">
             {aiAnalysis?.negotiationPoints ? (
               aiAnalysis.negotiationPoints.map((point: string, index: number) => (
-                <li key={index}>• {point}</li>
+                <li key={index} className="flex items-start gap-1.5">
+                  <span className="text-success">✓</span> 
+                  <span>{point}</span>
+                </li>
               ))
             ) : (
               <>
-                <li>• Request 20 PTO days (industry standard is 20-25 days)</li>
-                <li>• Negotiate for 10% performance bonus (currently 8%)</li>
-                <li>• Ask about professional development budget</li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-success">✓</span> 
+                  <span>Request 20 PTO days (industry standard is 20-25 days)</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-success">✓</span> 
+                  <span>Negotiate for 10% performance bonus (industry standard)</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-success">✓</span> 
+                  <span>Ask about professional development budget</span>
+                </li>
               </>
             )}
           </ul>
