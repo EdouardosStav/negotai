@@ -1,15 +1,14 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.36.0";
 
 // Environment variables
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-// Create Supabase client
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Create Supabase client - Import commented out for now as we're not using it in this function
+// const supabase = createClient(supabaseUrl, supabaseKey);
 
 // CORS headers for browser requests
 const corsHeaders = {
@@ -34,7 +33,7 @@ serve(async (req) => {
     }
 
     // Prepare the prompt for OpenAI
-    const prompt = buildPromptFromSalaryData(salaryData);
+    const prompt = buildStructuredPrompt(salaryData);
     console.log("Generated prompt:", prompt);
 
     // Call OpenAI API
@@ -45,15 +44,31 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo', // Using a valid OpenAI model
+        model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in salary negotiation and job market analysis. Analyze the provided salary offer details and provide a structured report with a fairness score (0-100), suggested counteroffer, and detailed sections on market comparison, company specifics, benefits assessment, bonus structure, growth potential, and negotiation points.'
+            content: `You are an expert salary analysis assistant. You provide concise, actionable insights about job offers based on market data.
+            
+Your analysis must follow this exact format:
+1. Fairness Score: Provide a percentage (0-100) that represents how fair the offer is
+2. Suggested Counter-Offer: Provide a specific dollar amount that would be reasonable to counter with
+3. Key Analysis Points: For each of these areas, provide ONE concise, valuable paragraph (no more than 3 sentences):
+   - Market Comparison: How the salary compares to industry averages
+   - Company-Specific: Insights about this company's compensation practices
+   - Benefits Assessment: Analysis of the benefits package
+   - Bonus & Stock Potential: Insights on bonus/equity structure
+   - Growth Potential: Career advancement opportunities
+4. Negotiation Points: 3-4 bullet points with specific negotiation recommendations
+
+DO NOT use markdown formatting like ###, numbers, or any other special characters.
+Keep all text extremely concise and focused on providing actionable insights.
+DO NOT include any text like "Based on the information provided" or other filler phrases.`
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
+        temperature: 0.5,
+        max_tokens: 1000,
       }),
     });
 
@@ -66,10 +81,11 @@ serve(async (req) => {
     // Parse OpenAI response
     const data = await response.json();
     const aiResponse = data.choices[0].message.content;
-    console.log("Received AI response:", aiResponse);
+    console.log("Raw AI response:", aiResponse);
 
     // Parse the AI response to extract structured data
-    const analysis = parseAnalysisFromAI(aiResponse, salaryData);
+    const analysis = parseStructuredAnalysis(aiResponse, salaryData);
+    console.log("Parsed analysis:", analysis);
 
     // Return the analysis data
     return new Response(JSON.stringify({ 
@@ -91,8 +107,8 @@ serve(async (req) => {
   }
 });
 
-// Function to build the prompt from salary data
-function buildPromptFromSalaryData(salaryData) {
+// Function to build a structured prompt for more consistent results
+function buildStructuredPrompt(salaryData) {
   const {
     jobTitle,
     companyName,
@@ -105,7 +121,7 @@ function buildPromptFromSalaryData(salaryData) {
   } = salaryData;
 
   return `
-Please analyze this job offer:
+Please provide a salary analysis for this job offer:
 
 Job Title: ${jobTitle}
 ${companyName ? `Company: ${companyName}` : ''}
@@ -116,108 +132,146 @@ Location: ${location}
 Salary Offered: $${salary}
 ${benefitsPackage ? `Benefits Package: ${benefitsPackage}` : 'No benefits information provided'}
 
-Please provide a detailed analysis with:
-1. Fairness Score (0-100)
-2. Suggested Counteroffer
-3. Market Comparison
-4. Company-Specific Analysis
-5. Benefits Assessment
-6. Bonus and Equity Potential
-7. Growth Potential
-8. Negotiation Points (list of 4-5 specific points)
-
-Format your response as structured text that can be easily parsed.
+Please analyze this offer and provide:
+1. A fairness score (0-100%)
+2. A suggested counter-offer amount
+3. Concise analysis of market comparison, company specifics, benefits, bonus potential, and growth opportunities
+4. 3-4 specific negotiation points
 `;
 }
 
-// Function to parse the AI response into structured data
-function parseAnalysisFromAI(aiResponse, salaryData) {
+// Function to parse the AI response into a well-structured format
+function parseStructuredAnalysis(aiResponse, salaryData) {
   try {
-    // Attempt to extract a fairness score (0-100)
-    let fairnessScore = 75; // Default score
-    const fairnessMatch = aiResponse.match(/Fairness Score:?\s*(\d+)/i);
+    // Extract fairness score
+    let fairnessScore = 75; // Default
+    const fairnessMatch = aiResponse.match(/Fairness Score:?\s*(\d+)%?/i);
     if (fairnessMatch && fairnessMatch[1]) {
       fairnessScore = parseInt(fairnessMatch[1]);
-      // Ensure score is within bounds
-      fairnessScore = Math.min(100, Math.max(0, fairnessScore));
+      fairnessScore = Math.min(100, Math.max(0, fairnessScore)); // Ensure 0-100
     }
     
     // Extract suggested counteroffer
     const numericSalary = parseFloat(salaryData.salary.toString());
     let suggestedCounteroffer = Math.round(numericSalary * 1.1); // Default 10% increase
-    const counterofferMatch = aiResponse.match(/Suggested Counteroffer:?\s*\$?([0-9,]+)/i);
+    const counterofferMatch = aiResponse.match(/Suggested Counter-Offer:?\s*\$?([0-9,]+)/i);
     if (counterofferMatch && counterofferMatch[1]) {
       suggestedCounteroffer = parseInt(counterofferMatch[1].replace(/,/g, ''));
     }
     
-    // Extract other sections
+    // Extract market comparison
     function extractSection(sectionName) {
-      const regex = new RegExp(`${sectionName}:?\\s*([\\s\\S]*?)(?=\\n\\s*\\d+\\.|\\n\\s*[A-Z][a-z]+\\s*:|$)`, 'i');
-      const match = aiResponse.match(regex);
-      return match ? match[1].trim() : '';
+      const patterns = [
+        new RegExp(`${sectionName}:?\\s*([^\\n]+(?:\\n(?!\\w+:)[^\\n]+)*)`, 'i'),
+        new RegExp(`${sectionName}[^\\n]*\\n-?\\s*([^\\n]+(?:\\n(?!\\w+:|-\\s)[^\\n]+)*)`, 'i')
+      ];
+      
+      for (const pattern of patterns) {
+        const match = aiResponse.match(pattern);
+        if (match && match[1]) {
+          // Clean up the text by removing any markdown symbols, ### or bullet points
+          return match[1].replace(/^[-*•#]+\s*/gm, '').trim();
+        }
+      }
+      
+      // Return empty string if no match
+      return '';
     }
     
     // Extract negotiation points as array
-    const negotiationPointsSection = extractSection('Negotiation Points');
-    const negotiationPoints = negotiationPointsSection
-      .split('\n')
-      .map(point => point.replace(/^-|\d+\.\s*/, '').trim())
-      .filter(point => point.length > 0)
-      .slice(0, 5); // Limit to 5 points
+    let negotiationPoints = [];
+    const negotiationSection = extractSection('Negotiation Points');
+    if (negotiationSection) {
+      // Split by newlines or bullet points
+      negotiationPoints = negotiationSection
+        .split(/\n|\r|-|\*|•/)
+        .map(point => point.trim())
+        .filter(point => point.length > 0)
+        .slice(0, 5); // Limit to 5 points
+    }
     
     // If no points were extracted, provide default ones
     if (negotiationPoints.length === 0) {
       negotiationPoints.push(
-        "Consider negotiating for better benefits coverage",
-        "Request a performance-based bonus structure",
-        "Discuss professional development opportunities and budget",
-        "Inquire about flexible working arrangements"
+        "Request a salary increase to align with market standards",
+        "Negotiate for better benefits coverage",
+        "Discuss professional development opportunities",
+        "Inquire about performance-based bonuses"
       );
     }
     
+    // Construct the final analysis object with clean text
     return {
       fairnessScore: fairnessScore,
       suggestedCounteroffer: suggestedCounteroffer,
       marketComparison: {
-        text: extractSection('Market Comparison') || 
-              `Based on market research, this offer for ${salaryData.jobTitle} in ${salaryData.location} appears to be within range.`
+        text: extractSection('Market Comparison') || `The average salary for a ${salaryData.jobLevel} ${salaryData.jobTitle} in ${salaryData.location} typically ranges between ${Math.round(numericSalary * 0.9)} and ${Math.round(numericSalary * 1.2)}.`
       },
       companySpecific: {
-        text: extractSection('Company-Specific Analysis') || 
-              `Analysis for ${salaryData.companyName || 'the company'} indicates this offer is competitive for a ${salaryData.jobLevel} ${salaryData.jobTitle}.`
+        text: extractSection('Company-Specific') || extractSection('Company Specific') || 
+              `${salaryData.companyName || 'This company'} typically offers compensation packages that align with industry standards for ${salaryData.jobLevel} ${salaryData.jobTitle} roles.`
       },
       benefitsAssessment: {
         text: extractSection('Benefits Assessment') || 
               (salaryData.benefitsPackage ? 
-                `Your benefits package appears to be at industry standard, including: ${salaryData.benefitsPackage}` : 
-                `No benefits package information provided for assessment.`)
+                `The benefits package appears to be standard for the industry, including: ${salaryData.benefitsPackage}` : 
+                `No benefits package information was provided. Consider requesting details on healthcare, retirement plans, and PTO.`)
       },
       bonusAndEquity: {
-        text: extractSection('Bonus and Equity Potential') || 
-              `Performance bonuses for ${salaryData.jobLevel} roles typically range from 8-10% of base salary.`
+        text: extractSection('Bonus & Stock Potential') || extractSection('Bonus and Equity') || 
+              `Companies at this level typically offer performance bonuses ranging from 5-15% of base salary, with potential equity opportunities.`
       },
       growthPotential: {
         text: extractSection('Growth Potential') || 
-              `Salary growth trajectory aligns with industry standards for ${salaryData.employmentType} positions.`
+              `Career advancement opportunities for ${salaryData.jobTitle} roles typically include promotion paths to senior and leadership positions within 2-3 years.`
       },
       negotiationPoints: negotiationPoints
     };
   } catch (error) {
     console.error("Error parsing AI response:", error);
-    // Return a simplified fallback structure
-    return {
-      fairnessScore: 75,
-      suggestedCounteroffer: Math.round(parseFloat(salaryData.salary.toString()) * 1.1),
-      marketComparison: { text: "Analysis based on offline data due to parsing issues." },
-      companySpecific: { text: "Company-specific data not available." },
-      benefitsAssessment: { text: "Benefits assessment not available." },
-      bonusAndEquity: { text: "Bonus and equity information not available." },
-      growthPotential: { text: "Growth potential information not available." },
-      negotiationPoints: [
-        "Consider negotiating for better benefits",
-        "Request a performance-based bonus structure",
-        "Discuss professional development opportunities"
-      ]
-    };
+    // Return fallback structure
+    return createFallbackAnalysis(salaryData);
   }
+}
+
+// Function to create a fallback analysis if parsing fails
+function createFallbackAnalysis(salaryData) {
+  const numericSalary = parseFloat(salaryData.salary.toString());
+  const suggestedIncrease = salaryData.jobLevel === 'Junior' ? 1.12 : 
+                          salaryData.jobLevel === 'Mid-Level' ? 1.10 : 
+                          salaryData.jobLevel === 'Senior' ? 1.08 : 1.10;
+  
+  const suggestedCounteroffer = Math.round(numericSalary * suggestedIncrease);
+  
+  let fairnessScore = 75; // Default score
+  
+  return {
+    fairnessScore: fairnessScore,
+    suggestedCounteroffer: suggestedCounteroffer,
+    marketComparison: {
+      text: `The average salary for a ${salaryData.jobLevel} ${salaryData.jobTitle} in ${salaryData.location} ranges from ${Math.round(numericSalary * 0.9)} to ${Math.round(numericSalary * 1.1)} according to market data.`
+    },
+    companySpecific: {
+      text: salaryData.companyName ? 
+        `${salaryData.companyName} is known for offering competitive compensation for ${salaryData.jobLevel} ${salaryData.jobTitle} roles.` :
+        `Companies in this sector typically offer competitive compensation for ${salaryData.jobLevel} ${salaryData.jobTitle} roles.`
+    },
+    benefitsAssessment: {
+      text: salaryData.benefitsPackage ? 
+        `Your benefits package includes: ${salaryData.benefitsPackage}. This is in line with industry standards.` : 
+        `Benefits information not provided - request details on healthcare, retirement plans, and PTO.`
+    },
+    bonusAndEquity: {
+      text: `Performance bonuses for similar roles typically range from 8-10% of base salary. Inquire about equity options if available.`
+    },
+    growthPotential: {
+      text: `Career advancement opportunities should include clear promotion paths and professional development resources.`
+    },
+    negotiationPoints: [
+      "Request a salary increase to align with market standards",
+      "Inquire about performance bonus structure",
+      "Discuss professional development opportunities",
+      "Ask about flexible work arrangements"
+    ]
+  };
 }

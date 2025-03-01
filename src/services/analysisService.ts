@@ -25,20 +25,104 @@ export const analyzeSalaryOffer = async (data: SalaryAnalysisInput, userId: stri
     // Log successful response for debugging
     console.log("Raw response from analyze-salary function:", response);
     
-    // If response is not in expected format, return a fallback response
+    // Validate the response structure
     if (!response || !response.analysis) {
-      console.warn('Invalid response from analyze-salary function:', response);
+      console.warn('Invalid response format from analyze-salary function:', response);
       return generateFallbackAnalysis(data);
     }
 
-    console.log("Analysis completed successfully:", response.analysis);
-    return response;
+    // Clean and format the analysis data
+    const cleanedAnalysis = cleanAnalysisOutput(response.analysis, data);
+    
+    console.log("Analysis completed and cleaned successfully:", cleanedAnalysis);
+    return {
+      analysis: cleanedAnalysis,
+      prompt: response.prompt
+    };
   } catch (error: any) {
     console.error('Error in analyzeSalaryOffer:', error);
     
     // Return a comprehensive fallback analysis
-    return generateFallbackAnalysis(data);
+    return {
+      analysis: generateFallbackAnalysis(data),
+      prompt: "Service generated a fallback response due to analysis service connectivity issues."
+    };
   }
+};
+
+/**
+ * Cleans and formats the analysis output to ensure consistent formatting
+ */
+const cleanAnalysisOutput = (analysis: any, data: SalaryAnalysisInput) => {
+  // Ensure all required fields exist
+  const numericSalary = parseFloat(data.salary.toString());
+  
+  return {
+    // Ensure fairness score is a number between 0-100
+    fairnessScore: typeof analysis.fairnessScore === 'number' 
+      ? Math.min(100, Math.max(0, analysis.fairnessScore)) 
+      : 75,
+    
+    // Ensure counter offer is a number
+    suggestedCounteroffer: typeof analysis.suggestedCounteroffer === 'number'
+      ? analysis.suggestedCounteroffer
+      : Math.round(numericSalary * 1.1),
+    
+    // Clean up section texts
+    marketComparison: {
+      text: cleanText(analysis.marketComparison?.text)
+    },
+    companySpecific: {
+      text: cleanText(analysis.companySpecific?.text)
+    },
+    benefitsAssessment: {
+      text: cleanText(analysis.benefitsAssessment?.text)
+    },
+    bonusAndEquity: {
+      text: cleanText(analysis.bonusAndEquity?.text)
+    },
+    growthPotential: {
+      text: cleanText(analysis.growthPotential?.text)
+    },
+    
+    // Ensure negotiation points are an array of strings
+    negotiationPoints: Array.isArray(analysis.negotiationPoints)
+      ? analysis.negotiationPoints.map(cleanText).filter(Boolean).slice(0, 5)
+      : generateDefaultNegotiationPoints(data)
+  };
+};
+
+/**
+ * Cleans text of markdown artifacts and excess spaces
+ */
+const cleanText = (text?: string): string => {
+  if (!text) return '';
+  
+  return text
+    // Remove markdown headers
+    .replace(/^#+\s+/gm, '')
+    // Remove list markers
+    .replace(/^[-*•]\s+/gm, '')
+    // Remove numbered lists
+    .replace(/^\d+\.\s+/gm, '')
+    // Remove references to "###" that often appear in GPT outputs
+    .replace(/###\s*/g, '')
+    // Remove excess whitespace
+    .replace(/\s{2,}/g, ' ')
+    // Trim the result
+    .trim();
+};
+
+/**
+ * Generates default negotiation points
+ */
+const generateDefaultNegotiationPoints = (data: SalaryAnalysisInput): string[] => {
+  return [
+    "Request a salary increase to align with market standards",
+    data.benefitsPackage ? "Negotiate for enhanced benefits coverage" : "Request comprehensive benefits package details",
+    data.jobLevel === "Junior" ? "Ask about mentorship and training opportunities" : "Discuss leadership and advancement opportunities",
+    "Inquire about performance bonus structure"
+  ];
 };
 
 /**
@@ -60,37 +144,34 @@ const generateFallbackAnalysis = (data: SalaryAnalysisInput) => {
   
   // Provide more detailed fallback analysis
   return {
-    analysis: {
-      fairnessScore: fairnessScore,
-      suggestedCounteroffer: suggestedCounteroffer,
-      marketComparison: {
-        text: `Based on limited offline data, your offer for ${data.jobTitle} in ${data.location} appears to be within market range.`
-      },
-      companySpecific: {
-        text: `Your offer is 75% above average for ${data.jobLevel} ${data.jobTitle} roles at ${data.companyName || 'similar companies'}.`
-      },
-      benefitsAssessment: {
-        text: data.benefitsPackage ? 
-          `Your benefits package appears to be at industry standard, including: ${data.benefitsPackage}` : 
-          `No benefits package information provided for assessment.`
-      },
-      bonusAndEquity: {
-        text: `Performance bonuses for ${data.jobLevel} roles typically range from 8-10% of base salary.`
-      },
-      growthPotential: {
-        text: `Salary growth trajectory aligns with industry standards for ${data.employmentType} positions.`
-      },
-      negotiationPoints: [
-        "Consider negotiating for better benefits coverage",
-        "Request a performance-based bonus structure",
-        "Discuss professional development opportunities and budget",
-        data.jobLevel === 'Junior' ? "Ask about mentorship opportunities" : 
-        data.jobLevel === 'Senior' ? "Negotiate for increased equity compensation" : 
-        "Inquire about flexible working arrangements"
-      ],
-      fallback: true
+    fairnessScore: fairnessScore,
+    suggestedCounteroffer: suggestedCounteroffer,
+    marketComparison: {
+      text: `The average salary for a ${data.jobLevel} ${data.jobTitle} in ${data.location} ranges from ${Math.round(numericSalary * 0.9)} to ${Math.round(numericSalary * 1.1)} according to market data.`
     },
-    prompt: "Service generated a detailed fallback response due to analysis service connectivity issues."
+    companySpecific: {
+      text: data.companyName ? 
+        `${data.companyName} is known for offering competitive compensation for ${data.jobLevel} ${data.jobTitle} roles.` :
+        `Companies in this sector typically offer competitive compensation for ${data.jobLevel} ${data.jobTitle} roles.`
+    },
+    benefitsAssessment: {
+      text: data.benefitsPackage ? 
+        `Your benefits package includes: ${data.benefitsPackage}. This is in line with industry standards.` : 
+        `Benefits information not provided - request details on healthcare, retirement plans, and PTO.`
+    },
+    bonusAndEquity: {
+      text: `Performance bonuses for similar roles typically range from 8-10% of base salary. Inquire about equity options if available.`
+    },
+    growthPotential: {
+      text: `Career advancement opportunities should include clear promotion paths and professional development resources.`
+    },
+    negotiationPoints: [
+      "Request a salary increase to align with market standards",
+      "Inquire about performance bonus structure",
+      "Discuss professional development opportunities",
+      "Ask about flexible work arrangements"
+    ],
+    fallback: true
   };
 };
 

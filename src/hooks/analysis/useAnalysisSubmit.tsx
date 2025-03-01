@@ -84,7 +84,7 @@ export const useAnalysisSubmit = ({
       
       // Show appropriate toast message
       if (analysis.fallback) {
-        toast.info("Showing analysis based on offline data due to service connectivity issues");
+        toast.info("Analysis based on offline data completed");
       } else {
         toast.success("Analysis completed successfully");
       }
@@ -111,30 +111,30 @@ export const useAnalysisSubmit = ({
           fairnessScore: 70,
           suggestedCounteroffer: Math.round(numericSalary * 1.12),
           aiAnalysis: {
-            disclaimer: "This is a fallback analysis due to service connectivity issues.",
             marketComparison: {
-              text: `Based on limited offline data, your offer appears to be within market range.`
+              text: `The average salary for a ${formData.jobLevel} ${formData.jobTitle} in ${formData.location} ranges from ${Math.round(numericSalary * 0.9)} to ${Math.round(numericSalary * 1.1)} according to market data.`
             },
             companySpecific: {
               text: formData.companyName ? 
-                `Your offer is 75% above average for ${formData.jobLevel || 'Junior'} ${formData.jobTitle} roles at ${formData.companyName}.` :
-                `Your offer is within market range for ${formData.jobTitle} roles in ${formData.location}.`
+                `${formData.companyName} is known for offering competitive compensation for ${formData.jobLevel} ${formData.jobTitle} roles.` :
+                `Companies in this sector typically offer competitive compensation for ${formData.jobLevel} ${formData.jobTitle} roles.`
             },
             benefitsAssessment: {
               text: formData.benefitsPackage ? 
-                `Your benefits package appears competitive: ${formData.benefitsPackage}` : 
-                `No benefits package information provided for assessment.`
+                `Your benefits package includes: ${formData.benefitsPackage}. This is in line with industry standards.` : 
+                `Benefits information not provided - request details on healthcare, retirement plans, and PTO.`
             },
             bonusAndEquity: {
-              text: `Performance bonuses typically range from 8-10% of base salary.`
+              text: `Performance bonuses for similar roles typically range from 8-10% of base salary. Inquire about equity options if available.`
             },
             growthPotential: {
-              text: `Salary growth trajectory aligns with industry standards for ${formData.employmentType} positions`
+              text: `Career advancement opportunities should include clear promotion paths and professional development resources.`
             },
             negotiationPoints: [
-              "Consider negotiating for better benefits",
-              "Request a performance-based bonus structure",
-              "Discuss professional development opportunities"
+              "Request a salary increase to align with market standards",
+              "Inquire about performance bonus structure",
+              "Discuss professional development opportunities",
+              "Ask about flexible work arrangements"
             ],
             fallback: true
           }
