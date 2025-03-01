@@ -36,7 +36,8 @@ export const useAnalysisForm = () => {
     formData,
     setIsAnalyzing,
     setAnalysisResults,
-    setFormSubmitted
+    setFormSubmitted,
+    setAnalysisError
   });
   
   // Get save analysis handlers
