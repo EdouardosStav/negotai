@@ -16,7 +16,9 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
-  AlertCircle 
+  AlertCircle,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -30,23 +32,11 @@ import {
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import EditAnalysisModal from "@/components/EditAnalysisModal";
+import DeleteAnalysisModal from "@/components/DeleteAnalysisModal";
+import { Database } from "@/integrations/supabase/client";
 
-interface SalaryAnalysis {
-  id: string;
-  job_title: string;
-  company_name: string | null;
-  job_level: string | null;
-  employment_type: string;
-  experience: string;
-  location: string;
-  offered_salary: number;
-  benefits_package: string | null;
-  fairness_score: number | null;
-  suggested_counteroffer: number | null;
-  negotiation_status: string;
-  created_at: string;
-  updated_at: string;
-}
+type SalaryAnalysis = Database['public']['Tables']['salary_analyses']['Row'];
 
 const AnalysisDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +45,10 @@ const AnalysisDetail = () => {
   const [analysis, setAnalysis] = useState<SalaryAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  
+  // State for modals
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   
   useEffect(() => {
     if (!user) {
@@ -102,6 +96,28 @@ const AnalysisDetail = () => {
     } finally {
       setIsUpdatingStatus(false);
     }
+  };
+
+  // Handle edit button click
+  const handleEdit = () => {
+    setEditModalOpen(true);
+  };
+  
+  // Handle delete button click
+  const handleDelete = () => {
+    setDeleteModalOpen(true);
+  };
+  
+  // Handle successful edit
+  const handleEditSuccess = (updatedAnalysis: SalaryAnalysis) => {
+    setAnalysis(updatedAnalysis);
+    toast.success("Analysis updated successfully");
+  };
+  
+  // Handle successful delete
+  const handleDeleteSuccess = () => {
+    toast.success("Analysis deleted successfully");
+    navigate('/dashboard');
   };
   
   const formatDate = (dateString: string) => {
@@ -197,9 +213,30 @@ const AnalysisDetail = () => {
                     )}
                   </div>
                   
-                  <div className={`px-4 py-1.5 rounded-full text-sm font-medium mt-4 md:mt-0 flex items-center ${getStatusClass(analysis.negotiation_status)}`}>
-                    {getStatusIcon(analysis.negotiation_status)}
-                    <span className="ml-1.5">{analysis.negotiation_status}</span>
+                  <div className="flex items-center gap-3 mt-4 md:mt-0">
+                    <div className={`px-4 py-1.5 rounded-full text-sm font-medium flex items-center ${getStatusClass(analysis.negotiation_status)}`}>
+                      {getStatusIcon(analysis.negotiation_status)}
+                      <span className="ml-1.5">{analysis.negotiation_status}</span>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={handleEdit}
+                        className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+                      >
+                        <Pencil size={16} />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={handleDelete}
+                        className="h-8 w-8 text-white/70 hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 
@@ -349,6 +386,22 @@ const AnalysisDetail = () => {
           </div>
         </div>
       </main>
+      
+      {/* Modals */}
+      <EditAnalysisModal 
+        analysis={analysis}
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+      />
+      
+      <DeleteAnalysisModal
+        analysis={analysis}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onSuccess={handleDeleteSuccess}
+      />
+      
       <Footer />
     </div>
   );
