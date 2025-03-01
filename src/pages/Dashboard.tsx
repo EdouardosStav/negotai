@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -19,31 +18,10 @@ import { toast } from "sonner";
 import { ChevronRight, ClipboardCheck, User, BriefcaseIcon, MapPinIcon, GraduationCapIcon, BarChart4, Calendar, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Database } from "@/integrations/supabase/client";
 
-interface SalaryAnalysis {
-  id: string;
-  job_title: string;
-  company_name: string | null;
-  job_level: string | null;
-  employment_type: string;
-  experience: string;
-  location: string;
-  offered_salary: number;
-  benefits_package: string | null;
-  fairness_score: number | null;
-  suggested_counteroffer: number | null;
-  negotiation_status: string;
-  created_at: string;
-}
-
-interface Profile {
-  id: string;
-  job_title: string | null;
-  experience_level: string | null;
-  industry: string | null;
-  location: string | null;
-  employment_type: string | null;
-}
+type SalaryAnalysis = Database['public']['Tables']['salary_analyses']['Row'];
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Dashboard = () => {
   const { user, isLoading: authLoading } = useAuth();

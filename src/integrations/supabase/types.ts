@@ -9,7 +9,93 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string | null
+          employment_type: string | null
+          experience_level: string | null
+          id: string
+          industry: string | null
+          job_title: string | null
+          location: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employment_type?: string | null
+          experience_level?: string | null
+          id: string
+          industry?: string | null
+          job_title?: string | null
+          location?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employment_type?: string | null
+          experience_level?: string | null
+          id?: string
+          industry?: string | null
+          job_title?: string | null
+          location?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      salary_analyses: {
+        Row: {
+          benefits_package: string | null
+          company_name: string | null
+          created_at: string | null
+          employment_type: string
+          experience: string
+          fairness_score: number | null
+          id: string
+          job_level: string | null
+          job_title: string
+          location: string
+          negotiation_status: string | null
+          offered_salary: number
+          suggested_counteroffer: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          benefits_package?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          employment_type: string
+          experience: string
+          fairness_score?: number | null
+          id?: string
+          job_level?: string | null
+          job_title: string
+          location: string
+          negotiation_status?: string | null
+          offered_salary: number
+          suggested_counteroffer?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          benefits_package?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          employment_type?: string
+          experience?: string
+          fairness_score?: number | null
+          id?: string
+          job_level?: string | null
+          job_title?: string
+          location?: string
+          negotiation_status?: string | null
+          offered_salary?: number
+          suggested_counteroffer?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
