@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { CheckCircle, AlertCircle, DollarSign, ShieldCheck, Building, Gift, Award, Clock } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -51,14 +50,11 @@ const SalaryAnalysis = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In the pre-auth experience, we simulate the form submission
-    // But would prompt for sign in before showing full results
     console.log("Form submitted, would require auth before showing full results");
     setFormSubmitted(true);
   };
 
   const handleSampleView = () => {
-    // Pre-fill the form with sample data for the demo
     setFormData({
       jobTitle: "Software Engineer",
       experience: "3-5",
@@ -69,13 +65,11 @@ const SalaryAnalysis = () => {
       jobLevel: "Senior",
       employmentType: "Full-Time"
     });
-    // Show sample results
     setFormSubmitted(true);
   };
 
   return (
     <section id="analyze" className="py-20 md:py-32 relative">
-      {/* Background elements */}
       <div className="absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
       <div className="absolute top-1/3 right-0 w-64 h-64 rounded-full bg-gradient-radial from-cyan/10 to-transparent blur-3xl"></div>
@@ -88,7 +82,6 @@ const SalaryAnalysis = () => {
         
         <div className="max-w-4xl mx-auto mt-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Form Section - Updated with new fields */}
             <div className="glass-card p-8 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-6">Analyze Your Offer</h3>
               
@@ -110,7 +103,6 @@ const SalaryAnalysis = () => {
                     />
                   </div>
                   
-                  {/* New Field: Company Name */}
                   <div>
                     <label htmlFor="companyName" className="block text-sm font-medium text-white/80 mb-2">
                       Company Name <span className="text-white/50">(Optional)</span>
@@ -131,7 +123,6 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  {/* New Field: Job Level */}
                   <div>
                     <label htmlFor="jobLevel" className="block text-sm font-medium text-white/80 mb-2">
                       Job Level <span className="text-white/50">(Optional)</span>
@@ -154,7 +145,6 @@ const SalaryAnalysis = () => {
                     </select>
                   </div>
                   
-                  {/* New Field: Employment Type */}
                   <div>
                     <label htmlFor="employmentType" className="block text-sm font-medium text-white/80 mb-2">
                       Employment Type
@@ -230,10 +220,9 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  {/* New Field: Benefits Package */}
                   <div>
                     <label htmlFor="benefitsPackage" className="block text-sm font-medium text-white/80 mb-2">
-                      Benefits Package <span className="text-xs text-white/50">(Health insurance, Stock options, Bonus, Remote policy, PTO, etc.)</span>
+                      Benefits Package
                     </label>
                     <div className="relative">
                       <div className="absolute top-3 left-4 pointer-events-none">
@@ -270,7 +259,6 @@ const SalaryAnalysis = () => {
                 </div>
               </form>
               
-              {/* Privacy links below the form */}
               <div className="flex items-center justify-center text-xs text-white/60 mt-4">
                 <a href="#privacy" className="hover:text-white mr-3 transition-colors">Privacy Policy</a>
                 <span className="mx-2">•</span>
@@ -278,7 +266,6 @@ const SalaryAnalysis = () => {
               </div>
             </div>
             
-            {/* Results Section - Enhanced with new assessments */}
             <div className="glass-card p-8 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
               {!formSubmitted ? (
                 <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
@@ -313,7 +300,6 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  {/* Updated Fairness Score */}
                   <div className="mb-6">
                     <div className="flex justify-between mb-2">
                       <span className="text-white/80">Fairness Score</span>
@@ -330,15 +316,13 @@ const SalaryAnalysis = () => {
                     </p>
                   </div>
                   
-                  {/* Updated Analysis Sections */}
                   <div className="space-y-4 mb-6">
-                    {/* Company-specific insights if company name is provided */}
                     {formData.companyName && (
                       <div className="flex items-start gap-3">
                         <Building className="text-cyan mt-1 flex-shrink-0" size={18} />
                         <p className="text-white/80 text-sm">
                           <span className="font-medium text-white block mb-1">Company Specific</span>
-                          Your offer is in the 75th percentile for {formData.jobLevel || "Senior"} {formData.jobTitle} roles at {formData.companyName}
+                          Your offer is 75% above average for {formData.jobLevel || "Senior"} {formData.jobTitle} roles at {formData.companyName}
                         </p>
                       </div>
                     )}
@@ -347,11 +331,10 @@ const SalaryAnalysis = () => {
                       <CheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
                       <p className="text-white/80 text-sm">
                         <span className="font-medium text-white block mb-1">Competitive Base Salary</span>
-                        Your offer is in the 70th percentile for {formData.jobLevel || "Senior"} {formData.jobTitle} roles in {formData.location}
+                        Your offer is 70% above industry average for {formData.jobLevel || "Senior"} {formData.jobTitle} roles in {formData.location}
                       </p>
                     </div>
                     
-                    {/* Benefits Analysis */}
                     {formData.benefitsPackage && (
                       <div className="flex items-start gap-3">
                         <Gift className="text-amber-400 mt-1 flex-shrink-0" size={18} />
@@ -362,7 +345,6 @@ const SalaryAnalysis = () => {
                       </div>
                     )}
                     
-                    {/* Bonus & Stock Potential */}
                     <div className="flex items-start gap-3">
                       <Award className="text-amber-400 mt-1 flex-shrink-0" size={18} />
                       <p className="text-white/80 text-sm">
@@ -371,7 +353,6 @@ const SalaryAnalysis = () => {
                       </p>
                     </div>
                     
-                    {/* Growth Potential */}
                     <div className="flex items-start gap-3">
                       <Clock className="text-success mt-1 flex-shrink-0" size={18} />
                       <p className="text-white/80 text-sm">
@@ -381,7 +362,6 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  {/* Updated Counter-Offer section */}
                   <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
                     <p className="text-white/90 text-sm mb-2">
                       <span className="font-medium text-white">Suggested Counter-Offer:</span>
@@ -424,7 +404,6 @@ const SalaryAnalysis = () => {
   );
 };
 
-// Chart icon SVG component - Increased size and improved color
 const ChartIcon = () => (
   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-cyan">
     <path d="M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
