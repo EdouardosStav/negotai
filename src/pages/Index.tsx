@@ -41,7 +41,9 @@ const Index = () => {
     <div className="min-h-screen bg-navy overflow-x-hidden">
       <Navbar />
       <main>
-        <Hero />
+        <div id="home">
+          <Hero />
+        </div>
         <Features />
         <SalaryAnalysis />
         <Testimonials />

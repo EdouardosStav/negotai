@@ -1,24 +1,54 @@
 
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isFeatureDropdownOpen, setIsFeatureDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+    
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    // Click outside to close dropdown
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsFeatureDropdownOpen(false);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleSignIn = () => {
     console.log("User clicked Sign In - would open auth modal");
     // For a real implementation, this would open the auth modal
     // or redirect to a sign-in page
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+      setIsMobileMenuOpen(false);
+      setIsFeatureDropdownOpen(false);
+    }
+  };
+
+  const toggleFeatureDropdown = () => {
+    setIsFeatureDropdownOpen(!isFeatureDropdownOpen);
   };
 
   return (
@@ -37,11 +67,60 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="nav-link">Home</a>
-            <a href="#features" className="nav-link">Features</a>
-            <a href="#pricing" className="nav-link">Pricing</a>
-            <a href="#about" className="nav-link">About</a>
-            <a href="#contact" className="nav-link">Contact</a>
+            <a 
+              href="#home" 
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("home");
+              }}
+            >
+              Home
+            </a>
+            
+            {/* Features Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button 
+                className="nav-link flex items-center"
+                onClick={toggleFeatureDropdown}
+                onMouseEnter={() => setIsFeatureDropdownOpen(true)}
+              >
+                Features <ChevronDown size={16} className="ml-1" />
+              </button>
+              
+              {isFeatureDropdownOpen && (
+                <div 
+                  className="absolute top-full left-0 mt-1 py-2 w-48 bg-navy-dark/90 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg z-50 animate-fade-in"
+                  onMouseLeave={() => setIsFeatureDropdownOpen(false)}
+                >
+                  <a 
+                    href="#analyze" 
+                    className="block px-4 py-2 text-white hover:bg-white/10 transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection("analyze");
+                    }}
+                  >
+                    Salary Analysis
+                  </a>
+                </div>
+              )}
+            </div>
+            
+            <Link to="/pricing" className="nav-link">Pricing</Link>
+            <Link to="/about" className="nav-link">About</Link>
+            
+            <a 
+              href="#contact" 
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("contact");
+              }}
+            >
+              Contact
+            </a>
+            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -72,40 +151,68 @@ const Navbar = () => {
         {isMobileMenuOpen && (
           <nav className="md:hidden flex flex-col items-center space-y-4 pt-6 pb-6 animate-fade-in">
             <a 
-              href="#" 
+              href="#home" 
               className="text-white hover:text-cyan transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("home");
+              }}
             >
               Home
             </a>
-            <a 
-              href="#features" 
-              className="text-white hover:text-cyan transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Features
-            </a>
-            <a 
-              href="#pricing" 
+            
+            {/* Mobile Features Dropdown */}
+            <div className="w-full text-center">
+              <button 
+                className="text-white hover:text-cyan transition-colors flex items-center justify-center w-full"
+                onClick={toggleFeatureDropdown}
+              >
+                Features <ChevronDown size={16} className="ml-1" />
+              </button>
+              
+              {isFeatureDropdownOpen && (
+                <div className="mt-2 py-2 bg-navy-light/50 rounded-lg animate-fade-in">
+                  <a 
+                    href="#analyze" 
+                    className="block py-2 text-white hover:text-cyan transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection("analyze");
+                    }}
+                  >
+                    Salary Analysis
+                  </a>
+                </div>
+              )}
+            </div>
+            
+            <Link 
+              to="/pricing" 
               className="text-white hover:text-cyan transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Pricing
-            </a>
-            <a 
-              href="#about" 
+            </Link>
+            
+            <Link 
+              to="/about" 
               className="text-white hover:text-cyan transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               About
-            </a>
+            </Link>
+            
             <a 
               href="#contact" 
               className="text-white hover:text-cyan transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("contact");
+              }}
             >
               Contact
             </a>
+            
             <button 
               onClick={handleSignIn}
               className="text-white hover:text-cyan transition-colors"
