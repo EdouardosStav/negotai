@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { ChevronDown, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -83,18 +84,13 @@ const MobileNavMenu = ({
       )}
       
       {isAuthenticated ? (
-        
-          
-            
-          
-          <button 
-            onClick={onSignOut}
-            className="flex items-center text-white hover:text-cyan transition-colors"
-          >
-            <LogOut size={16} className="mr-2" />
-            Sign Out
-          </button>
-        
+        <button 
+          onClick={onSignOut}
+          className="flex items-center text-white hover:text-cyan transition-colors"
+        >
+          <LogOut size={16} className="mr-2" />
+          Sign Out
+        </button>
       ) : (
         <button onClick={onSignIn} className="text-white hover:text-cyan transition-colors">
           Sign In
