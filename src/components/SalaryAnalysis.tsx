@@ -23,10 +23,19 @@ const SalaryAnalysis = () => {
     jobLevel: "",
     employmentType: "Full-Time"
   });
+  
+  // Static analysis results - won't update until form is submitted
   const [analysisResults, setAnalysisResults] = useState({
     fairnessScore: 80,
     suggestedCounteroffer: 0
   });
+  
+  // Static sample data for preview - won't update with form changes
+  const sampleData = {
+    jobLevel: "Senior",
+    employmentType: "Full-Time"
+  };
+  
   const analysisRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,6 +109,7 @@ const SalaryAnalysis = () => {
   };
 
   const handleSampleView = () => {
+    // Use static sample data that doesn't rely on form inputs
     setFormData({
       jobTitle: "Software Engineer",
       experience: "3-5",
@@ -201,6 +211,7 @@ const SalaryAnalysis = () => {
               
               <form onSubmit={handleSubmit}>
                 <div className="space-y-5">
+                  {/* Job Details Section - Reordered to match the Edit Salary Analysis modal */}
                   <div>
                     <label htmlFor="jobTitle" className="block text-sm font-medium text-white/80 mb-2">
                       Job Title
@@ -237,82 +248,87 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
-                  <div>
-                    <label htmlFor="jobLevel" className="block text-sm font-medium text-white/80 mb-2">
-                      Job Level <span className="text-white/50">(Optional)</span>
-                    </label>
-                    <select 
-                      id="jobLevel" 
-                      name="jobLevel" 
-                      value={formData.jobLevel} 
-                      onChange={handleChange} 
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                    >
-                      <option value="" disabled className="bg-navy-dark">Select job level</option>
-                      <option value="Junior" className="bg-navy-dark">Junior</option>
-                      <option value="Mid-Level" className="bg-navy-dark">Mid-Level</option>
-                      <option value="Senior" className="bg-navy-dark">Senior</option>
-                      <option value="Lead" className="bg-navy-dark">Lead</option>
-                      <option value="Director" className="bg-navy-dark">Director</option>
-                      <option value="VP" className="bg-navy-dark">VP</option>
-                      <option value="C-Level" className="bg-navy-dark">C-Level</option>
-                    </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label htmlFor="jobLevel" className="block text-sm font-medium text-white/80 mb-2">
+                        Job Level <span className="text-white/50">(Optional)</span>
+                      </label>
+                      <select 
+                        id="jobLevel" 
+                        name="jobLevel" 
+                        value={formData.jobLevel} 
+                        onChange={handleChange} 
+                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
+                      >
+                        <option value="" disabled className="bg-navy-dark">Select job level</option>
+                        <option value="Junior" className="bg-navy-dark">Junior</option>
+                        <option value="Mid-Level" className="bg-navy-dark">Mid-Level</option>
+                        <option value="Senior" className="bg-navy-dark">Senior</option>
+                        <option value="Lead" className="bg-navy-dark">Lead</option>
+                        <option value="Director" className="bg-navy-dark">Director</option>
+                        <option value="VP" className="bg-navy-dark">VP</option>
+                        <option value="C-Level" className="bg-navy-dark">C-Level</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="employmentType" className="block text-sm font-medium text-white/80 mb-2">
+                        Employment Type
+                      </label>
+                      <select 
+                        id="employmentType" 
+                        name="employmentType" 
+                        value={formData.employmentType} 
+                        onChange={handleChange} 
+                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
+                        required
+                      >
+                        <option value="Full-Time" className="bg-navy-dark">Full-Time</option>
+                        <option value="Contract" className="bg-navy-dark">Contract</option>
+                        <option value="Internship" className="bg-navy-dark">Internship</option>
+                      </select>
+                    </div>
                   </div>
                   
-                  <div>
-                    <label htmlFor="employmentType" className="block text-sm font-medium text-white/80 mb-2">
-                      Employment Type
-                    </label>
-                    <select 
-                      id="employmentType" 
-                      name="employmentType" 
-                      value={formData.employmentType} 
-                      onChange={handleChange} 
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all"
-                      required
-                    >
-                      <option value="Full-Time" className="bg-navy-dark">Full-Time</option>
-                      <option value="Contract" className="bg-navy-dark">Contract</option>
-                      <option value="Internship" className="bg-navy-dark">Internship</option>
-                    </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label htmlFor="experience" className="block text-sm font-medium text-white/80 mb-2">
+                        Years of Experience
+                      </label>
+                      <select 
+                        id="experience" 
+                        name="experience" 
+                        value={formData.experience} 
+                        onChange={handleChange} 
+                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
+                        required
+                      >
+                        <option value="" disabled className="bg-navy-dark">Select experience</option>
+                        <option value="0-2" className="bg-navy-dark">0-2 years</option>
+                        <option value="3-5" className="bg-navy-dark">3-5 years</option>
+                        <option value="6-10" className="bg-navy-dark">6-10 years</option>
+                        <option value="10+" className="bg-navy-dark">10+ years</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="location" className="block text-sm font-medium text-white/80 mb-2">
+                        Location
+                      </label>
+                      <input 
+                        type="text" 
+                        id="location" 
+                        name="location" 
+                        value={formData.location} 
+                        onChange={handleChange} 
+                        placeholder="San Francisco, CA" 
+                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
+                        required 
+                      />
+                    </div>
                   </div>
                   
-                  <div>
-                    <label htmlFor="experience" className="block text-sm font-medium text-white/80 mb-2">
-                      Years of Experience
-                    </label>
-                    <select 
-                      id="experience" 
-                      name="experience" 
-                      value={formData.experience} 
-                      onChange={handleChange} 
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
-                      required
-                    >
-                      <option value="" disabled className="bg-navy-dark">Select experience</option>
-                      <option value="0-2" className="bg-navy-dark">0-2 years</option>
-                      <option value="3-5" className="bg-navy-dark">3-5 years</option>
-                      <option value="6-10" className="bg-navy-dark">6-10 years</option>
-                      <option value="10+" className="bg-navy-dark">10+ years</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="location" className="block text-sm font-medium text-white/80 mb-2">
-                      Location
-                    </label>
-                    <input 
-                      type="text" 
-                      id="location" 
-                      name="location" 
-                      value={formData.location} 
-                      onChange={handleChange} 
-                      placeholder="San Francisco, CA" 
-                      className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50 transition-all" 
-                      required 
-                    />
-                  </div>
-                  
+                  {/* Salary Section */}
                   <div>
                     <label htmlFor="salary" className="block text-sm font-medium text-white/80 mb-2">
                       Offered Salary (USD)
@@ -334,6 +350,7 @@ const SalaryAnalysis = () => {
                     </div>
                   </div>
                   
+                  {/* Benefits Section */}
                   <div>
                     <label htmlFor="benefitsPackage" className="block text-sm font-medium text-white/80 mb-2">
                       Benefits Package
@@ -392,7 +409,8 @@ const SalaryAnalysis = () => {
                   <div className="glass-card p-5 rounded-lg text-left text-sm text-white/80 shadow-lg space-y-3 w-full">
                     <p className="font-medium text-white mb-2">Example insights:</p>
                     <div className="space-y-3">
-                      <p className="py-1.5 px-2 bg-white/5 rounded-md">Your salary offer is 15% below market value for a {formData.jobLevel || "Senior"} role. Consider negotiating for $135K – $145K.</p>
+                      {/* Static sample insights that don't update with form changes */}
+                      <p className="py-1.5 px-2 bg-white/5 rounded-md">Your salary offer is 15% below market value for a {sampleData.jobLevel} role. Consider negotiating for $135K – $145K.</p>
                       <p className="py-1.5 px-2 bg-white/5 rounded-md">Your benefits package is below industry standard. Request additional PTO days and higher equity percentage.</p>
                     </div>
                   </div>
