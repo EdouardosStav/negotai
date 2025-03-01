@@ -45,7 +45,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Using a cheaper model for cost-effectiveness
+        model: 'gpt-3.5-turbo', // Using a valid OpenAI model
         messages: [
           {
             role: 'system',
