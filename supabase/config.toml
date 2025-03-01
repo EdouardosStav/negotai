@@ -1,6 +1,5 @@
 
 project_id = "wdrdyvyzrxrzmotarpzp"
 
-[[functions]]
-name = "analyze-salary"
+[functions.analyze-salary]
 verify_jwt = false
