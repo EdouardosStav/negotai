@@ -1,69 +1,163 @@
-# Welcome to your Lovable project
+# NegotAI - AI-Powered Salary Negotiation Platform
 
-## Project info
+## 📌 Overview
 
-**URL**: https://lovable.dev/projects/a5310d65-fe35-45c2-9114-d101167b7369
+NegotAI is an AI-driven platform designed to help professionals analyze and negotiate their job offers with confidence. Leveraging OpenAI's API, real-time market data from LinkedIn, Glassdoor, and Payscale, and Supabase for authentication and data storage, NegotAI provides users with personalized salary insights and strategic negotiation recommendations.
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- **Salary Analysis**: Enter job details to receive AI-generated insights on your offer.
+- **Fairness Score**: Evaluate how competitive your salary offer is compared to industry standards.
+- **Suggested Counter-Offer**: AI-driven recommendations for an optimized salary request.
+- **Benefits Assessment**: Analyze non-monetary compensations such as bonuses, equity, and PTO.
+- **User Dashboard**: Save and track salary negotiations.
+- **Authentication**: Secure login using Supabase Auth.
+- **Modern UI**: Built with React, TailwindCSS, and ShadCN for a sleek, user-friendly experience.
 
-**Use Lovable**
+## 🏗️ Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a5310d65-fe35-45c2-9114-d101167b7369) and start prompting.
+### Frontend
 
-Changes made via Lovable will be committed automatically to this repo.
+- **React.js** - Component-based UI library
+- **TypeScript** - Ensuring type safety
+- **Vite** - Fast and optimized build tool
+- **ShadCN/UI** - Modern component library
+- **TailwindCSS** - Responsive styling
 
-**Use your preferred IDE**
+### Backend & Database
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Supabase** - Authentication, database, and edge functions
+- **OpenAI API** - AI-powered salary analysis and negotiation insights
+- **Edge Functions** - Serverless execution for real-time processing
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### DevOps & Deployment
 
-Follow these steps:
+- **GitHub Actions** - Automated CI/CD workflows
+- **Vercel** - Frontend hosting for fast performance
+- **Docker** (Optional) - Containerized local development
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📂 Project Structure
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+📦 negotai
+├── 📂 public                 # Static assets (favicons, images)
+├── 📂 src                    # Main application source code
+│   ├── 📂 components         # Reusable UI components
+│   ├── 📂 context            # React contexts for global state
+│   ├── 📂 hooks              # Custom hooks
+│   ├── 📂 integrations       # API integrations
+│   ├── 📂 lib                # Utility functions
+│   ├── 📂 pages              # Page components (e.g., Dashboard, Salary Analysis)
+│   ├── 📂 services           # API and data-fetching logic
+│   ├── 📂 utils              # Helper functions
+├── 📂 supabase               # Supabase edge functions & config
+├── 📜 index.html             # HTML entry point
+├── 📜 package.json           # Dependencies and scripts
+├── 📜 README.md              # Project documentation
+├── 📜 vite.config.ts         # Vite configuration
+└── 📜 tailwind.config.ts     # TailwindCSS configuration
 ```
 
-**Edit a file directly in GitHub**
+## 🔧 Setup & Installation
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Prerequisites
 
-**Use GitHub Codespaces**
+Ensure you have the following installed:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Node.js (v16+)
+- npm or yarn
+- Supabase account and project setup
+- OpenAI API Key
 
-## What technologies are used for this project?
+### Steps to Run Locally
 
-This project is built with .
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/negotai.git
+   cd negotai
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Configure environment variables: Create a `.env` file in the root directory and add:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_OPENAI_API_KEY=your_openai_api_key
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🚀 Deployment
 
-## How can I deploy this project?
+### Deploying to Vercel
 
-Simply open [Lovable](https://lovable.dev/projects/a5310d65-fe35-45c2-9114-d101167b7369) and click on Share -> Publish.
+1. Install Vercel CLI:
+   ```bash
+   npm install -g vercel
+   ```
+2. Login to Vercel:
+   ```bash
+   vercel login
+   ```
+3. Deploy the project:
+   ```bash
+   vercel
+   ```
 
-## I want to use a custom domain - is that possible?
+## 🤖 API Usage
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+### Salary Analysis Request
+
+Endpoint: `POST /api/analyze-offer`
+
+#### Request Payload
+
+```json
+{
+  "jobTitle": "Software Engineer",
+  "companyName": "TechCorp Inc.",
+  "jobLevel": "Senior",
+  "employmentType": "Full-Time",
+  "experienceYears": "3-5 years",
+  "location": "San Francisco, CA",
+  "offeredSalary": 120000,
+  "benefits": "Health Insurance, 2% Equity, 8% Bonus, Hybrid Work, 15 PTO Days"
+}
+```
+
+#### Response
+
+```json
+{
+  "fairnessScore": 75,
+  "suggestedCounterOffer": 134400,
+  "marketComparison": "Your offer is in the 70% range compared to industry standards.",
+  "benefitsAnalysis": "Your equity (2%) is competitive, but PTO (15 days) is below the industry average (20 days).",
+  "negotiationTips": [
+    "Request 20 PTO days",
+    "Negotiate for a 10% performance bonus",
+    "Ask about professional development budget"
+  ]
+}
+```
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+## ✨ Contributors
+
+- **Edouardos Stavrakis** - Creator & Developer
+
+## 📬 Contact
+
+For inquiries, reach out via [info@negotai.site](mailto\:info@negotai.site)
+
+---
+
+Feel free to modify and add more details as necessary!
+
