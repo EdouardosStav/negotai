@@ -1,11 +1,14 @@
+
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
+
 const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
+  
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -17,19 +20,22 @@ const Hero = () => {
     }, {
       threshold: 0.1
     });
+    
     const heroEl = heroRef.current;
     if (heroEl) {
       observer.observe(heroEl);
     }
+    
     return () => {
       if (heroEl) {
         observer.unobserve(heroEl);
       }
     };
   }, []);
-  const handleAnalyzeClick = () => {
+  
+  const handleAnalyzeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     // For now, we just scroll to the analyze section
-    // Later, this will handle auth flow
     const analyzeSection = document.getElementById('analyze');
     if (analyzeSection) {
       analyzeSection.scrollIntoView({
@@ -39,10 +45,11 @@ const Hero = () => {
 
     // In a real implementation, we would check auth state here
     // and show the auth modal if needed
-    // For now, we'll just simulate this with a console log
     console.log("User clicked Analyze My Offer - would check auth state here");
   };
-  return <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden" id="hero">
+  
+  return (
+    <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden" id="hero">
       {/* Background elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-cyan/5 to-transparent"></div>
@@ -97,6 +104,8 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Hero;

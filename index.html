@@ -1,12 +1,24 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>offer-intellect</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
-    <meta property="og:image" content="/og-image.png" />
+    <title>NegotAI - AI Salary Negotiation</title>
+    <meta name="description" content="AI-Powered Salary Negotiation Platform" />
+    <meta name="author" content="Edouardos Stavrakis" />
+    <meta property="og:image" content="./og-image.png" />
+    <link rel="icon" href="./favicon.ico" />
+    <script type="module">
+      // This script helps with GitHub Pages SPA routing
+      (function() {
+        const redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   </head>
 
   <body>
