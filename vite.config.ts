@@ -10,7 +10,6 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    // Ensure JavaScript files are properly emitted with correct extensions
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name].[hash].js',
