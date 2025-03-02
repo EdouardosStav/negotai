@@ -7,6 +7,16 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/negotai/' : '/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    // Ensure assets have hashes to prevent caching issues
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
   server: {
     host: "::",
     port: 8080,
