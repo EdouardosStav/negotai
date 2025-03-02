@@ -10,9 +10,12 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    // Ensure assets have hashes to prevent caching issues
+    // Ensure JavaScript files are properly emitted with correct extensions
     rollupOptions: {
       output: {
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
         manualChunks: undefined,
       },
     },
