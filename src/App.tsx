@@ -112,11 +112,20 @@ const AppRoutes = () => {
   );
 };
 
-// For Vercel, we don't need basename configuration as it handles routes correctly
+// Determine basename for BrowserRouter based on environment
+const getBasename = () => {
+  // In production (GitHub Pages), use the repo name as the basename
+  if (import.meta.env.PROD) {
+    return '/negotai';
+  }
+  // In development, use the root
+  return '/';
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={getBasename()}>
         <AuthProvider>
           <Toaster />
           <Sonner />

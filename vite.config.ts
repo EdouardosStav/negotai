@@ -6,9 +6,11 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Set base path depending on environment
-  // For Vercel, we can use '/' as the base path
-  base: '/',
+  base: mode === 'production' ? '/negotai/' : '/',
+  server: {
+    host: "::",
+    port: 8080,
+  },
   plugins: [
     react(),
     mode === 'development' &&
@@ -18,31 +20,5 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    // Configure MIME types correctly for deployed environments
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: ({name}) => {
-          if (/\.(gif|jpe?g|png|svg)$/.test(name ?? '')) {
-            return 'assets/images/[name].[hash][extname]';
-          }
-          
-          if (/\.css$/.test(name ?? '')) {
-            return 'assets/css/[name].[hash][extname]';
-          }
-          
-          return 'assets/[name].[hash][extname]';
-        },
-      },
-    },
-  },
-  server: {
-    host: "::",
-    port: 8080,
   },
 }));
