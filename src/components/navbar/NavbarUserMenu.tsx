@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface NavbarUserMenuProps {
   onSignOut: () => Promise<void>;
@@ -81,18 +81,16 @@ const NavbarUserMenu = ({ onSignIn, onSignOut }: NavbarUserMenuProps) => {
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button onClick={onSignIn} className="text-white hover:text-cyan transition-colors duration-300">
-            Sign In
-          </button>
-        </TooltipTrigger>
-        <TooltipContent className="bg-navy-dark border border-white/10 text-white">
-          <p>Sign in to access your account</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button onClick={onSignIn} className="text-white hover:text-cyan transition-colors duration-300">
+          Sign In
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="bg-navy-dark border border-white/10 text-white">
+        <p>Sign in to access your account</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 
