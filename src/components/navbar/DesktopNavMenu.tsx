@@ -20,7 +20,7 @@ const DesktopNavMenu = ({
   const { isAuthenticated } = useAuth();
 
   return (
-    <nav className="hidden md:flex items-center space-x-8">
+    <nav className="hidden md:flex items-center space-x-6">
       <Link to="/" className="nav-link" onClick={e => {
         if (window.location.pathname === '/') {
           e.preventDefault();
