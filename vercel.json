@@ -3,5 +3,15 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "trailingSlash": false
+  "trailingSlash": false,
+  "preview": {
+    "env": {
+      "VERCEL_TOOLBAR": "false"
+    }
+  },
+  "production": {
+    "env": {
+      "VERCEL_TOOLBAR": "false"
+    }
+  }
 }
