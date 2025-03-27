@@ -11,7 +11,6 @@ import MobileMenuToggle from "./MobileMenuToggle";
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isFeatureDropdownOpen, setIsFeatureDropdownOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -47,12 +46,7 @@ const Navbar = () => {
         behavior: "smooth"
       });
       setIsMobileMenuOpen(false);
-      setIsFeatureDropdownOpen(false);
     }
-  };
-
-  const toggleFeatureDropdown = () => {
-    setIsFeatureDropdownOpen(!isFeatureDropdownOpen);
   };
 
   const openContactModal = () => {
@@ -82,8 +76,6 @@ const Navbar = () => {
 
           <MobileNavMenu 
             isOpen={isMobileMenuOpen}
-            isFeatureDropdownOpen={isFeatureDropdownOpen}
-            toggleFeatureDropdown={toggleFeatureDropdown}
             scrollToSection={scrollToSection}
             onClose={() => setIsMobileMenuOpen(false)}
             onSignIn={handleSignIn}

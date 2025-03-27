@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import Index from "./pages/Index";
-import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import NegotiationGuide from "./pages/NegotiationGuide";
@@ -82,7 +80,6 @@ const AppRoutes = () => {
       <ScrollToSection />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/negotiation-guide" element={<NegotiationGuide />} />
         <Route path="/faq" element={<FAQ />} />

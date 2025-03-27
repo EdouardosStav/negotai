@@ -1,12 +1,10 @@
 
 import { Link } from "react-router-dom";
-import { ChevronDown, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface MobileNavMenuProps {
   isOpen: boolean;
-  isFeatureDropdownOpen: boolean;
-  toggleFeatureDropdown: () => void;
   scrollToSection: (sectionId: string) => void;
   onClose: () => void;
   onSignIn: () => void;
@@ -16,8 +14,6 @@ interface MobileNavMenuProps {
 
 const MobileNavMenu = ({
   isOpen, 
-  isFeatureDropdownOpen,
-  toggleFeatureDropdown,
   scrollToSection,
   onClose,
   onSignIn,
@@ -38,31 +34,6 @@ const MobileNavMenu = ({
         onClose();
       }}>
         Home
-      </Link>
-      
-      <div className="w-full text-center">
-        <button className="text-white hover:text-cyan transition-colors flex items-center justify-center w-full" onClick={toggleFeatureDropdown}>
-          Features <ChevronDown size={16} className="ml-1" />
-        </button>
-        
-        {isFeatureDropdownOpen && (
-          <div className="mt-2 py-2 bg-purple-500/20 rounded-lg animate-fade-in">
-            <a href="#analyze" className="block py-2 text-white hover:text-cyan transition-colors" onClick={e => {
-              e.preventDefault();
-              scrollToSection("analyze");
-            }}>
-              Salary Analysis
-            </a>
-            <div className="flex items-center justify-center py-2 text-white/70">
-              <span>AI Negotiation Chat</span>
-              <span className="ml-2 text-xs text-cyan/60 font-medium">Coming Soon!</span>
-            </div>
-          </div>
-        )}
-      </div>
-      
-      <Link to="/pricing" className="text-white hover:text-cyan transition-colors" onClick={onClose}>
-        Pricing
       </Link>
       
       <Link to="/about" className="text-white hover:text-cyan transition-colors" onClick={onClose}>
