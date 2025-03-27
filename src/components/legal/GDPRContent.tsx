@@ -1,33 +1,29 @@
 
 import LegalTabContent from "./LegalTabContent";
+import LegalSection from "./LegalSection";
 
 const GDPRContent = () => {
   return (
     <LegalTabContent title="GDPR Compliance">
-      <h3 className="text-xl font-semibold text-white mt-6">1. Data Controller</h3>
-      <p className="text-white/80">
+      <LegalSection title="1. Data Controller">
         NegotAI acts as a data controller for personal information collected through our service. We determine the purposes and means of processing this data.
-      </p>
+      </LegalSection>
       
-      <h3 className="text-xl font-semibold text-white mt-6">2. Legal Basis for Processing</h3>
-      <p className="text-white/80">
+      <LegalSection title="2. Legal Basis for Processing">
         We process your data based on your consent, contractual necessity, legitimate interests, or legal obligations, depending on the specific processing activity.
-      </p>
+      </LegalSection>
       
-      <h3 className="text-xl font-semibold text-white mt-6">3. Data Subject Rights</h3>
-      <p className="text-white/80">
+      <LegalSection title="3. Data Subject Rights">
         Under GDPR, you have rights including access, rectification, erasure, restriction of processing, data portability, and objection to processing.
-      </p>
+      </LegalSection>
       
-      <h3 className="text-xl font-semibold text-white mt-6">4. International Data Transfers</h3>
-      <p className="text-white/80">
+      <LegalSection title="4. International Data Transfers">
         If we transfer your data outside the EEA, we ensure appropriate safeguards are in place to protect your information.
-      </p>
+      </LegalSection>
       
-      <h3 className="text-xl font-semibold text-white mt-6">5. Data Protection Officer</h3>
-      <p className="text-white/80">
+      <LegalSection title="5. Data Protection Officer">
         If you have questions about our GDPR compliance, please contact our Data Protection Officer at dpo@negotiai.com.
-      </p>
+      </LegalSection>
     </LegalTabContent>
   );
 };
