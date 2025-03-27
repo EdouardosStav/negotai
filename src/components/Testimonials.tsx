@@ -10,9 +10,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useToast } from "@/hooks/use-toast";
 
 const Testimonials = () => {
   const testimonialsRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -38,6 +40,24 @@ const Testimonials = () => {
       }
     };
   }, []);
+
+  const handleShareClick = () => {
+    window.open("mailto:stories@negotiai.com", "_blank");
+    toast({
+      title: "Thank you for your interest!",
+      description: "We've opened an email form for you to share your experience.",
+      duration: 5000,
+    });
+  };
+
+  const handleJoinClick = () => {
+    window.open("mailto:earlyaccess@negotiai.com", "_blank");
+    toast({
+      title: "Early access request sent!",
+      description: "We'll be in touch soon about joining our early access program.",
+      duration: 5000,
+    });
+  };
 
   return (
     <section id="testimonials" className="py-20 md:py-32 relative">
@@ -119,8 +139,8 @@ const Testimonials = () => {
                           <div className="mt-4">
                             <Button 
                               variant="outline" 
-                              className="bg-white/5 border-white/20 hover:bg-white/10"
-                              onClick={() => window.location.href = "mailto:stories@negotiai.com"}
+                              className="bg-white/5 border-white/20 hover:bg-white/10 hover:scale-[1.02] transition-transform"
+                              onClick={handleShareClick}
                             >
                               <Mail className="mr-2 h-4 w-4" />
                               Share Your Experience
@@ -144,8 +164,8 @@ const Testimonials = () => {
             </p>
             <Button 
               size="lg"
-              className="bg-primary hover:bg-primary/90"
-              onClick={() => window.location.href = "mailto:earlyaccess@negotiai.com"}
+              className="bg-primary hover:bg-primary/90 hover:scale-[1.02] transition-transform"
+              onClick={handleJoinClick}
             >
               Join Now
               <ArrowRight className="ml-2 h-4 w-4" />
