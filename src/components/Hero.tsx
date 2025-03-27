@@ -1,14 +1,11 @@
-
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
-
 const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
-  
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -20,19 +17,16 @@ const Hero = () => {
     }, {
       threshold: 0.1
     });
-    
     const heroEl = heroRef.current;
     if (heroEl) {
       observer.observe(heroEl);
     }
-    
     return () => {
       if (heroEl) {
         observer.unobserve(heroEl);
       }
     };
   }, []);
-  
   const handleAnalyzeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     // For now, we just scroll to the analyze section
@@ -47,9 +41,7 @@ const Hero = () => {
     // and show the auth modal if needed
     console.log("User clicked Analyze My Offer - would check auth state here");
   };
-  
-  return (
-    <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden" id="hero">
+  return <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden" id="hero">
       {/* Background elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-cyan/5 to-transparent"></div>
@@ -91,21 +83,9 @@ const Hero = () => {
         </div>
         
         <div className="flex justify-center">
-          <div className="glass-card px-6 py-4 rounded-lg flex items-center justify-center gap-4 max-w-sm animate-float">
-            <div className="flex items-center">
-              <span className="h-3 w-3 rounded-full bg-success mr-2"></span>
-              <span className="text-sm text-white/80">5,293+ Successful Negotiations</span>
-            </div>
-            <div className="h-10 w-px bg-white/10"></div>
-            <div className="flex items-center">
-              <span className="h-3 w-3 rounded-full bg-premium mr-2"></span>
-              <span className="text-sm text-white/80">$1.2M+ Salary Increases</span>
-            </div>
-          </div>
+          
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
