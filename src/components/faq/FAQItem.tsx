@@ -15,7 +15,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ item, index }) => {
         {item.question}
       </AccordionTrigger>
       <AccordionContent className="px-5 pb-5 text-white/70">
-        {item.answer}
+        <div dangerouslySetInnerHTML={{ __html: item.answer }} />
       </AccordionContent>
     </AccordionItem>
   );
