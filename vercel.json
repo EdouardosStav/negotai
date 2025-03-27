@@ -3,8 +3,5 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "trailingSlash": false,
-  "buildEnv": {
-    "VERCEL_TOOLBAR": "false"
-  }
+  "trailingSlash": false
 }
