@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import AnalysisDetail from "./pages/AnalysisDetail";
 import { FC, ReactNode } from "react";
 
+// Initialize the React Query client
 const queryClient = new QueryClient();
 
 // Protected route component
@@ -112,18 +113,20 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+const App = () => {
+  return (
     <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AppRoutes />
-        </TooltipProvider>
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <AppRoutes />
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </BrowserRouter>
-  </QueryClientProvider>
-);
+  );
+};
 
 export default App;
