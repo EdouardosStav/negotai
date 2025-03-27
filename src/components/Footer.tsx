@@ -1,23 +1,23 @@
-
 import { useState } from "react";
 import { Mail, Github, Twitter, Linkedin, Heart } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import ContactModal from "./ContactModal";
-
 const Footer = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const currentYear = new Date().getFullYear();
   const navigate = useNavigate();
   const location = useLocation();
-
   const scrollToSection = (sectionId: string) => {
     // Check if we're on the home page
     if (location.pathname !== '/') {
       // If not, navigate to home and then scroll after page loads
-      navigate('/', { state: { scrollTo: sectionId } });
+      navigate('/', {
+        state: {
+          scrollTo: sectionId
+        }
+      });
       return;
     }
-    
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({
@@ -25,13 +25,14 @@ const Footer = () => {
       });
     }
   };
-  
   const handleLegalClick = (section: string) => {
-    navigate('/legal', { state: { section } });
+    navigate('/legal', {
+      state: {
+        section
+      }
+    });
   };
-  
-  return (
-    <>
+  return <>
       <footer className="pt-16 pb-8 relative" id="contact">
         {/* Background elements - adding pointer-events-none to fix clickable area */}
         <div className="absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
@@ -71,10 +72,7 @@ const Footer = () => {
                   <Link to="/about" className="text-white/70 hover:text-white transition-colors">About Us</Link>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => setIsContactModalOpen(true)} 
-                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
-                  >
+                  <button onClick={() => setIsContactModalOpen(true)} className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">
                     Contact Us
                   </button>
                 </li>
@@ -89,10 +87,7 @@ const Footer = () => {
                   <Link to="/negotiation-guide" className="text-white/70 hover:text-white transition-colors">Negotiation Guide</Link>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => scrollToSection("testimonials")} 
-                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
-                  >
+                  <button onClick={() => scrollToSection("testimonials")} className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">
                     Success Stories
                   </button>
                 </li>
@@ -107,34 +102,22 @@ const Footer = () => {
               <h3 className="text-white font-bold mb-4">Legal</h3>
               <ul className="space-y-3">
                 <li>
-                  <button 
-                    onClick={() => handleLegalClick("terms")} 
-                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
-                  >
+                  <button onClick={() => handleLegalClick("terms")} className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">
                     Terms of Service
                   </button>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => handleLegalClick("privacy")} 
-                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
-                  >
+                  <button onClick={() => handleLegalClick("privacy")} className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">
                     Privacy Policy
                   </button>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => handleLegalClick("cookies")} 
-                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
-                  >
+                  <button onClick={() => handleLegalClick("cookies")} className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">
                     Cookie Policy
                   </button>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => handleLegalClick("gdpr")} 
-                    className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer"
-                  >
+                  <button onClick={() => handleLegalClick("gdpr")} className="text-white/70 hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">
                     GDPR
                   </button>
                 </li>
@@ -146,21 +129,13 @@ const Footer = () => {
             <p className="text-white/50 text-sm">
               © {currentYear} NegotAI. All rights reserved.
             </p>
-            <p className="text-white/50 text-sm mt-4 md:mt-0 flex items-center">
-              <a href="mailto:support@negotiai.com" className="hover:text-white transition-colors">support@negotiai.com</a>
-              <Heart size={14} className="text-primary mx-1" />
-            </p>
+            
           </div>
         </div>
       </footer>
       
       {/* Contact Modal */}
-      <ContactModal 
-        isOpen={isContactModalOpen} 
-        onClose={() => setIsContactModalOpen(false)} 
-      />
-    </>
-  );
+      <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
+    </>;
 };
-
 export default Footer;

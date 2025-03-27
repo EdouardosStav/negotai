@@ -44,9 +44,7 @@ const About = () => {
           <div className="max-w-4xl mx-auto mb-20">
             <h2 className="text-3xl font-bold text-white mb-6">Our Story</h2>
             <div className="glass-card p-8 rounded-xl">
-              <p className="text-white/80 mb-4 leading-relaxed">
-                NegotAI was founded in 2023 by a team of AI engineers, data scientists, and HR professionals who recognized a significant problem: most people lack the data, confidence, and strategies needed to effectively negotiate their salaries.
-              </p>
+              <p className="text-white/80 mb-4 leading-relaxed">NegotAI was founded in 2024 by a team of AI engineers, data scientists, and HR professionals who recognized a significant problem: most people lack the data, confidence, and strategies needed to effectively negotiate their salaries.</p>
               <p className="text-white/80 mb-4 leading-relaxed">
                 After seeing friends and colleagues consistently undersell their value in the job market, our founders decided to build an AI-powered solution that would level the playing field in salary negotiations.
               </p>
