@@ -1,75 +1,58 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useToast } from "@/hooks/use-toast";
-
 const Testimonials = () => {
   const testimonialsRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("opacity-100");
-            entry.target.classList.remove("opacity-0", "translate-y-10");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("opacity-100");
+          entry.target.classList.remove("opacity-0", "translate-y-10");
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
     const testimonialsEl = testimonialsRef.current;
     if (testimonialsEl) {
       observer.observe(testimonialsEl);
     }
-    
     return () => {
       if (testimonialsEl) {
         observer.unobserve(testimonialsEl);
       }
     };
   }, []);
-
   const handleShareClick = () => {
     window.open("https://tally.so/r/wozOM5", "_blank");
     toast({
       title: "Thank you for your interest!",
       description: "We've opened a form for you to share your experience.",
-      duration: 5000,
+      duration: 5000
     });
   };
-
   const handleJoinClick = () => {
     window.open("mailto:earlyaccess@negotiai.com", "_blank");
     toast({
       title: "Early access request sent!",
       description: "We'll be in touch soon about joining our early access program.",
-      duration: 5000,
+      duration: 5000
     });
   };
-
-  return (
-    <section id="testimonials" className="py-20 md:py-32 relative">
+  return <section id="testimonials" className="py-20 md:py-32 relative">
       {/* Background elements */}
       <div className="absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
       <div className="absolute bottom-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
       <div className="absolute bottom-1/4 left-0 w-64 h-64 rounded-full bg-gradient-radial from-primary/10 to-transparent blur-3xl"></div>
       
-      <div 
-        ref={testimonialsRef}
-        className="container mx-auto px-4 relative z-10 opacity-0 translate-y-10 transition-all duration-1000 ease-out"
-      >
+      <div ref={testimonialsRef} className="container mx-auto px-4 relative z-10 opacity-0 translate-y-10 transition-all duration-1000 ease-out">
         <h2 className="section-heading text-center">Success Stories</h2>
         <p className="section-subheading text-center mb-8">
           See how professionals could benefit from NegotAI
@@ -137,11 +120,7 @@ const Testimonials = () => {
                             Your feedback will help us build a better tool for everyone.
                           </p>
                           <div className="mt-4">
-                            <Button 
-                              variant="outline" 
-                              className="bg-white/5 border-white/20 hover:bg-white/10 hover:scale-[1.02] transition-transform"
-                              onClick={handleShareClick}
-                            >
+                            <Button variant="outline" className="bg-white/5 border-white/20 hover:bg-white/10 hover:scale-[1.02] transition-transform" onClick={handleShareClick}>
                               <Mail className="mr-2 h-4 w-4" />
                               Share Your Experience
                             </Button>
@@ -158,23 +137,9 @@ const Testimonials = () => {
           </div>
 
           {/* CTA Section */}
-          <div className="text-center">
-            <p className="text-white/80 mb-4">
-              Want to be featured here? Join our early access community.
-            </p>
-            <Button 
-              size="lg"
-              className="bg-primary hover:bg-primary/90 hover:scale-[1.02] transition-transform"
-              onClick={handleJoinClick}
-            >
-              Join Now
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
+          
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Testimonials;
