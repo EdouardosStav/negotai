@@ -1,44 +1,17 @@
 
-import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, User, DollarSign } from "lucide-react";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Jessica T.",
-    role: "Product Manager",
-    content: "NegotAI helped me secure a higher salary than initially offered. The AI-generated talking points were extremely helpful during my negotiation.",
-    increase: 25000,
-    industry: "Tech"
-  },
-  {
-    id: 2,
-    name: "Michael R.",
-    role: "Software Engineer",
-    content: "I was about to accept the first offer until NegotAI showed me industry comparisons. Used their strategy and got a significant bump plus better benefits.",
-    increase: 18500,
-    industry: "Software"
-  },
-  {
-    id: 3,
-    name: "Sarah K.",
-    role: "Marketing Director",
-    content: "The salary insights were spot-on for my industry and location. NegotAI's negotiation script helped me secure not just more pay, but also additional stock options.",
-    increase: 32000,
-    industry: "Marketing"
-  },
-  {
-    id: 4,
-    name: "David L.",
-    role: "Financial Analyst",
-    content: "As someone who hates negotiating, this tool was a lifesaver. The personalized counter-offer strategy worked perfectly and I got a much better compensation package.",
-    increase: 15000,
-    industry: "Finance"
-  },
-];
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight, ArrowRight, Mail } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const Testimonials = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const testimonialsRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -66,18 +39,6 @@ const Testimonials = () => {
     };
   }, []);
 
-  const nextTestimonial = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-  };
-
-  const prevTestimonial = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
-  };
-
-  const handleDotClick = (index: number) => {
-    setCurrentIndex(index);
-  };
-
   return (
     <section id="testimonials" className="py-20 md:py-32 relative">
       {/* Background elements */}
@@ -90,94 +51,105 @@ const Testimonials = () => {
         className="container mx-auto px-4 relative z-10 opacity-0 translate-y-10 transition-all duration-1000 ease-out"
       >
         <h2 className="section-heading text-center">Success Stories</h2>
-        <p className="section-subheading text-center">
-          See how professionals have improved their compensation with NegotAI
+        <p className="section-subheading text-center mb-8">
+          See how professionals could benefit from NegotAI
         </p>
         
         <div className="max-w-4xl mx-auto mt-12">
-          {/* Success Stats */}
+          {/* Aspirational Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="glass-card p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-gradient mb-2">5,200+</div>
-              <p className="text-white/70 text-sm">Successful Negotiations</p>
+              <div className="text-xl font-bold text-gradient mb-2">Built to help thousands</div>
+              <p className="text-white/70 text-sm">negotiate with confidence</p>
             </div>
             
             <div className="glass-card p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-gradient mb-2">$20K+</div>
-              <p className="text-white/70 text-sm">Average Salary Increase</p>
+              <div className="text-xl font-bold text-gradient mb-2">AI tools designed</div>
+              <p className="text-white/70 text-sm">to uncover your true value</p>
             </div>
             
             <div className="glass-card p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-gradient mb-2">98%</div>
-              <p className="text-white/70 text-sm">User Satisfaction</p>
+              <div className="text-xl font-bold text-gradient mb-2">Created with professionals</div>
+              <p className="text-white/70 text-sm">for professionals</p>
             </div>
           </div>
           
-          {/* Testimonial Slider */}
-          <div className="relative">
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-              >
-                {testimonials.map((testimonial) => (
-                  <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
-                    <div className="glass-card p-8 md:p-10 rounded-xl relative">
-                      <div className="flex flex-col md:flex-row md:items-start gap-6">
-                        <div className="flex-shrink-0 flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10">
-                          <User className="text-white/70" size={24} />
-                        </div>
-                        <div>
-                          <div className="flex items-center">
-                            <h3 className="text-xl font-bold text-white mb-1">{testimonial.name}</h3>
+          {/* Testimonial Carousel */}
+          <div className="relative mb-12">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {/* Sample Story Card */}
+                <CarouselItem className="md:basis-1/2 lg:basis-1/2">
+                  <div className="p-1">
+                    <Card className="glass-card border border-white/10">
+                      <CardContent className="p-6">
+                        <div className="flex flex-col gap-4">
+                          <div className="bg-primary/10 text-primary/80 text-xs uppercase font-semibold px-2 py-1 rounded-md w-fit">
+                            Sample Story
                           </div>
-                          <div className="text-white/60 text-sm mb-4">{testimonial.role} | {testimonial.industry}</div>
-                          <p className="text-white/80 mb-6">"{testimonial.content}"</p>
-                          <div className="flex items-center px-4 py-3 bg-primary/10 rounded-lg border border-primary/20 w-fit">
-                            <DollarSign className="text-success mr-2" size={18} />
-                            <span className="text-white font-medium">Salary Increase: </span>
-                            <span className="text-success font-bold ml-2">${testimonial.increase.toLocaleString()}</span>
+                          <h3 className="text-lg font-bold text-white">How NegotAI could help</h3>
+                          <p className="text-white/80">
+                            "The salary insights would be invaluable for my industry and location. 
+                            Having AI-generated negotiation scripts would help me approach 
+                            conversations with confidence and data to back up my requests."
+                          </p>
+                          <div className="mt-4 pt-4 border-t border-white/10">
+                            <p className="text-white/60 text-sm">Software Engineer | Tech Industry</p>
                           </div>
                         </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Navigation */}
-            <div className="flex justify-between mt-8">
-              <div className="flex items-center gap-3">
-                {testimonials.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleDotClick(index)}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      index === currentIndex ? "bg-cyan" : "bg-white/20"
-                    }`}
-                    aria-label={`Go to testimonial ${index + 1}`}
-                  />
-                ))}
-              </div>
-              
-              <div className="flex gap-3">
-                <button
-                  onClick={prevTestimonial}
-                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
-                  aria-label="Previous testimonial"
-                >
-                  <ChevronLeft size={20} className="text-white" />
-                </button>
-                <button
-                  onClick={nextTestimonial}
-                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
-                  aria-label="Next testimonial"
-                >
-                  <ChevronRight size={20} className="text-white" />
-                </button>
-              </div>
-            </div>
+                </CarouselItem>
+                
+                {/* Share Your Story Card */}
+                <CarouselItem className="md:basis-1/2 lg:basis-1/2">
+                  <div className="p-1">
+                    <Card className="glass-card border border-white/10">
+                      <CardContent className="p-6">
+                        <div className="flex flex-col gap-4 h-full">
+                          <h3 className="text-lg font-bold text-white">Share your story</h3>
+                          <p className="text-white/80">
+                            We're looking for professionals to join our early access program 
+                            and share their salary negotiation experiences.
+                          </p>
+                          <p className="text-white/80 flex-grow">
+                            Your feedback will help us build a better tool for everyone.
+                          </p>
+                          <div className="mt-4">
+                            <Button 
+                              variant="outline" 
+                              className="bg-white/5 border-white/20 hover:bg-white/10"
+                              onClick={() => window.location.href = "mailto:stories@negotiai.com"}
+                            >
+                              <Mail className="mr-2 h-4 w-4" />
+                              Share Your Experience
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              </CarouselContent>
+              <CarouselPrevious className="absolute left-0 -translate-x-1/2" />
+              <CarouselNext className="absolute right-0 translate-x-1/2" />
+            </Carousel>
+          </div>
+
+          {/* CTA Section */}
+          <div className="text-center">
+            <p className="text-white/80 mb-4">
+              Want to be featured here? Join our early access community.
+            </p>
+            <Button 
+              size="lg"
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => window.location.href = "mailto:earlyaccess@negotiai.com"}
+            >
+              Join Now
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
