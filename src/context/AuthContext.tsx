@@ -53,11 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (event === 'SIGNED_IN') {
         if (isManualSignIn) {
-          toast({
-            title: "Successfully signed in",
-            description: "Welcome back!",
-            variant: "default",
-          });
+          // Use only Sonner toast to avoid duplication
           sonnerToast.success("Successfully signed in", {
             description: "Welcome back!"
           });
@@ -67,11 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Redirect to home page instead of dashboard
         navigate('/');
       } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Signed out",
-          description: "You have been successfully signed out.",
-          variant: "default",
-        });
+        // Use only Sonner toast to avoid duplication
         sonnerToast.success("Signed out");
         navigate('/');
       }
@@ -94,11 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
     } catch (error: any) {
-      toast({
-        title: "Sign in failed",
-        description: error.message || "An error occurred during sign in",
-        variant: "destructive",
-      });
+      // Use only Sonner toast to avoid duplication
       sonnerToast.error("Sign in failed", {
         description: error.message || "An error occurred during sign in"
       });
@@ -120,20 +108,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
       
-      toast({
-        title: "Sign up successful",
-        description: "Check your email for the confirmation link",
-        variant: "default",
-      });
+      // Use only Sonner toast to avoid duplication
       sonnerToast.success("Sign up successful", {
         description: "Check your email for the confirmation link"
       });
     } catch (error: any) {
-      toast({
-        title: "Sign up failed",
-        description: error.message || "An error occurred during sign up",
-        variant: "destructive",
-      });
+      // Use only Sonner toast to avoid duplication
       sonnerToast.error("Sign up failed", {
         description: error.message || "An error occurred during sign up"
       });
@@ -160,11 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthenticated(false);
         
         // Show success toast anyway to provide feedback
-        toast({
-          title: "Signed out",
-          description: "You have been successfully signed out.",
-          variant: "default",
-        });
+        // Use only Sonner toast to avoid duplication
         sonnerToast.success("Signed out");
         navigate('/');
       }
@@ -176,11 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setIsAuthenticated(false);
       
-      toast({
-        title: "Sign out issue",
-        description: "You've been signed out, but there was a technical issue.",
-        variant: "default",
-      });
+      // Use only Sonner toast to avoid duplication
       sonnerToast.success("Signed out");
       navigate('/');
     } finally {
