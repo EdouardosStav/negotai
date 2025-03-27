@@ -32,6 +32,17 @@ const NavbarUserMenu = ({ onSignIn, onSignOut }: NavbarUserMenuProps) => {
     setIsUserDropdownOpen(!isUserDropdownOpen);
   };
 
+  // Handle sign out with error prevention
+  const handleSignOut = async () => {
+    try {
+      setIsUserDropdownOpen(false);
+      await onSignOut();
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      // The dropdown is already closed, so we don't need to do anything else here
+    }
+  };
+
   if (isAuthenticated) {
     return (
       <div className="relative" ref={userDropdownRef}>
@@ -57,7 +68,7 @@ const NavbarUserMenu = ({ onSignIn, onSignOut }: NavbarUserMenuProps) => {
               Dashboard
             </Link>
             <button 
-              onClick={onSignOut}
+              onClick={handleSignOut}
               className="flex items-center w-full px-4 py-2 text-white hover:bg-purple-500/20 transition-colors"
             >
               <LogOut size={16} className="mr-2" />

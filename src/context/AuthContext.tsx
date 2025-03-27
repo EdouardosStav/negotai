@@ -144,25 +144,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Sign out
+  // Sign out - improved with better error handling
   const signOut = async () => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signOut();
       
-      if (error) {
-        throw error;
+      // Only attempt sign out if we have a valid session
+      if (session) {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      } else {
+        // If no session, just clear the local state
+        setSession(null);
+        setUser(null);
+        setIsAuthenticated(false);
+        
+        // Show success toast anyway to provide feedback
+        toast({
+          title: "Signed out",
+          description: "You have been successfully signed out.",
+          variant: "default",
+        });
+        sonnerToast.success("Signed out");
+        navigate('/');
       }
     } catch (error: any) {
-      toast({
-        title: "Sign out failed",
-        description: error.message || "An error occurred during sign out",
-        variant: "destructive",
-      });
-      sonnerToast.error("Sign out failed", {
-        description: error.message || "An error occurred during sign out"
-      });
       console.error('Error signing out:', error);
+      
+      // Still reset auth state on error
+      setSession(null);
+      setUser(null);
+      setIsAuthenticated(false);
+      
+      toast({
+        title: "Sign out issue",
+        description: "You've been signed out, but there was a technical issue.",
+        variant: "default",
+      });
+      sonnerToast.success("Signed out");
+      navigate('/');
     } finally {
       setIsLoading(false);
     }
