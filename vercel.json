@@ -4,14 +4,7 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "trailingSlash": false,
-  "preview": {
-    "env": {
-      "VERCEL_TOOLBAR": "false"
-    }
-  },
-  "production": {
-    "env": {
-      "VERCEL_TOOLBAR": "false"
-    }
+  "buildEnv": {
+    "VERCEL_TOOLBAR": "false"
   }
 }
