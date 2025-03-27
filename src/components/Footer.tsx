@@ -147,7 +147,8 @@ const Footer = () => {
               © {currentYear} NegotAI. All rights reserved.
             </p>
             <p className="text-white/50 text-sm mt-4 md:mt-0 flex items-center">
-              Crafted with <Heart size={14} className="text-primary mx-1" /> by the NegotAI Team
+              <a href="mailto:support@negotiai.com" className="hover:text-white transition-colors">support@negotiai.com</a>
+              <Heart size={14} className="text-primary mx-1" />
             </p>
           </div>
         </div>

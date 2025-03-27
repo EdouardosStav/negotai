@@ -23,6 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isManualSignIn, setIsManualSignIn] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -51,23 +52,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(!!newSession);
       
       if (event === 'SIGNED_IN') {
-        toast({
-          title: "Successfully signed in",
-          description: "Welcome back!",
-          variant: "default",
-        });
-        sonnerToast.success("Successfully signed in", {
-          description: "Welcome back!"
-        });
-        
-        // If user is coming from a specific page, redirect them back
-        const redirectPath = sessionStorage.getItem('redirectAfterAuth');
-        if (redirectPath) {
-          sessionStorage.removeItem('redirectAfterAuth');
-          navigate(redirectPath);
-        } else {
-          navigate('/dashboard');
+        if (isManualSignIn) {
+          toast({
+            title: "Successfully signed in",
+            description: "Welcome back!",
+            variant: "default",
+          });
+          sonnerToast.success("Successfully signed in", {
+            description: "Welcome back!"
+          });
+          setIsManualSignIn(false);
         }
+        
+        // Redirect to home page instead of dashboard
+        navigate('/');
       } else if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
@@ -83,12 +81,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast, navigate]);
+  }, [toast, navigate, isManualSignIn]);
 
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
+      setIsManualSignIn(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
@@ -114,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string) => {
     try {
       setIsLoading(true);
+      setIsManualSignIn(true);
       const { error } = await supabase.auth.signUp({ email, password });
       
       if (error) {

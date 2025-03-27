@@ -1,27 +1,23 @@
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, User, DollarSign, Star, ShieldCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, User, DollarSign } from "lucide-react";
 
 const testimonials = [
   {
     id: 1,
     name: "Jessica T.",
     role: "Product Manager",
-    content: "NegotAI helped me land a $25K higher salary than initially offered. The AI-generated talking points gave me the confidence to negotiate effectively.",
+    content: "NegotAI helped me secure a higher salary than initially offered. The AI-generated talking points were extremely helpful during my negotiation.",
     increase: 25000,
-    rating: 5,
-    industry: "Tech",
-    verified: true
+    industry: "Tech"
   },
   {
     id: 2,
     name: "Michael R.",
     role: "Software Engineer",
-    content: "I was about to accept the first offer until NegotAI showed me I was being underpaid by 15%. Used their strategy and got a significant bump plus better benefits.",
+    content: "I was about to accept the first offer until NegotAI showed me industry comparisons. Used their strategy and got a significant bump plus better benefits.",
     increase: 18500,
-    rating: 5,
-    industry: "Software",
-    verified: true
+    industry: "Software"
   },
   {
     id: 3,
@@ -29,19 +25,15 @@ const testimonials = [
     role: "Marketing Director",
     content: "The salary insights were spot-on for my industry and location. NegotAI's negotiation script helped me secure not just more pay, but also additional stock options.",
     increase: 32000,
-    rating: 5,
-    industry: "Marketing",
-    verified: true
+    industry: "Marketing"
   },
   {
     id: 4,
     name: "David L.",
     role: "Financial Analyst",
-    content: "As someone who hates negotiating, this tool was a lifesaver. The personalized counter-offer strategy worked perfectly and I got $15K more than the initial offer.",
+    content: "As someone who hates negotiating, this tool was a lifesaver. The personalized counter-offer strategy worked perfectly and I got a much better compensation package.",
     increase: 15000,
-    rating: 4,
-    industry: "Finance",
-    verified: false
+    industry: "Finance"
   },
 ];
 
@@ -86,10 +78,6 @@ const Testimonials = () => {
     setCurrentIndex(index);
   };
 
-  const calculateTotalIncrease = () => {
-    return testimonials.reduce((sum, testimonial) => sum + testimonial.increase, 0);
-  };
-
   return (
     <section id="testimonials" className="py-20 md:py-32 relative">
       {/* Background elements */}
@@ -103,7 +91,7 @@ const Testimonials = () => {
       >
         <h2 className="section-heading text-center">Success Stories</h2>
         <p className="section-subheading text-center">
-          See how professionals like you have improved their compensation with NegotAI
+          See how professionals have improved their compensation with NegotAI
         </p>
         
         <div className="max-w-4xl mx-auto mt-12">
@@ -115,13 +103,13 @@ const Testimonials = () => {
             </div>
             
             <div className="glass-card p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-gradient mb-2">Over $100,000</div>
-              <p className="text-white/70 text-sm">in Salary Gains for Our Users!</p>
+              <div className="text-3xl font-bold text-gradient mb-2">$20K+</div>
+              <p className="text-white/70 text-sm">Average Salary Increase</p>
             </div>
             
             <div className="glass-card p-6 rounded-xl text-center">
               <div className="text-3xl font-bold text-gradient mb-2">98%</div>
-              <p className="text-white/70 text-sm">Client Satisfaction</p>
+              <p className="text-white/70 text-sm">User Satisfaction</p>
             </div>
           </div>
           
@@ -140,23 +128,8 @@ const Testimonials = () => {
                           <User className="text-white/70" size={24} />
                         </div>
                         <div>
-                          <div className="flex items-center mb-2">
-                            {[...Array(5)].map((_, i) => (
-                              <Star 
-                                key={i} 
-                                size={16} 
-                                className={i < testimonial.rating ? "text-premium fill-premium" : "text-white/20"} 
-                              />
-                            ))}
-                          </div>
                           <div className="flex items-center">
                             <h3 className="text-xl font-bold text-white mb-1">{testimonial.name}</h3>
-                            {testimonial.verified && (
-                              <div className="ml-2 flex items-center text-xs text-premium font-medium">
-                                <ShieldCheck size={14} className="mr-1" />
-                                <span>Verified User</span>
-                              </div>
-                            )}
                           </div>
                           <div className="text-white/60 text-sm mb-4">{testimonial.role} | {testimonial.industry}</div>
                           <p className="text-white/80 mb-6">"{testimonial.content}"</p>

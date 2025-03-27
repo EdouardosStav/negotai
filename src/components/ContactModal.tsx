@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
     // Close modal after 3 seconds on successful submission
@@ -43,27 +45,53 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
     };
   }, [isOpen]);
 
+  // Set name and email if user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Set email from user data
+      setEmail(user.email || "");
+      
+      // If user has metadata with name, use it
+      const metadata = user.user_metadata;
+      if (metadata && (metadata.name || metadata.full_name)) {
+        setName(metadata.name || metadata.full_name || "");
+      }
+    }
+  }, [isAuthenticated, user]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    if (!message.trim()) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Please provide a message",
         variant: "destructive",
       });
       return;
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid email address",
-        variant: "destructive",
-      });
-      return;
+    // Email validation only required for non-authenticated users
+    if (!isAuthenticated) {
+      if (!name.trim() || !email.trim()) {
+        toast({
+          title: "Error",
+          description: "Please fill in all fields",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        toast({
+          title: "Error",
+          description: "Please enter a valid email address",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -127,33 +155,37 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-white mb-1">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-navy-light border border-white/10 rounded-md py-2 px-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50"
-                placeholder="Your name"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-navy-light border border-white/10 rounded-md py-2 px-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50"
-                placeholder="Your email"
-              />
-            </div>
+            {!isAuthenticated && (
+              <>
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-white mb-1">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-navy-light border border-white/10 rounded-md py-2 px-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50"
+                    placeholder="Your name"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-navy-light border border-white/10 rounded-md py-2 px-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cyan/50"
+                    placeholder="Your email"
+                  />
+                </div>
+              </>
+            )}
             
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-white mb-1">

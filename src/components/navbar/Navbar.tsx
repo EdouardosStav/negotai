@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import ContactModal from "../ContactModal";
 import DesktopNavMenu from "./DesktopNavMenu";
@@ -14,6 +14,7 @@ const Navbar = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +50,20 @@ const Navbar = () => {
     }
   };
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      // If already on homepage, scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      // Navigate to homepage
+      navigate('/');
+    }
+  };
+
   const toggleFeatureDropdown = () => {
     setIsFeatureDropdownOpen(!isFeatureDropdownOpen);
   };
@@ -64,9 +79,9 @@ const Navbar = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-white hover:text-cyan transition-colors duration-300">
+              <a href="/" onClick={handleLogoClick} className="text-xl font-bold text-white hover:text-cyan transition-colors duration-300">
                 NegotAI
-              </Link>
+              </a>
             </div>
 
             <DesktopNavMenu 
