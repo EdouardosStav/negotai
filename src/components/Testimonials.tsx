@@ -42,10 +42,10 @@ const Testimonials = () => {
   }, []);
 
   const handleShareClick = () => {
-    window.open("mailto:stories@negotiai.com", "_blank");
+    window.open("https://tally.so/r/wozOM5", "_blank");
     toast({
       title: "Thank you for your interest!",
-      description: "We've opened an email form for you to share your experience.",
+      description: "We've opened a form for you to share your experience.",
       duration: 5000,
     });
   };
