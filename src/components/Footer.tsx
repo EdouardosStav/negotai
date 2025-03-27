@@ -58,9 +58,7 @@ const Footer = () => {
                 <a href="https://github.com/negotiai" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all" aria-label="GitHub">
                   <Github size={16} className="text-white" />
                 </a>
-                <a href="mailto:support@negotiai.com" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all" aria-label="Email">
-                  <Mail size={16} className="text-white" />
-                </a>
+                
               </div>
             </div>
             
