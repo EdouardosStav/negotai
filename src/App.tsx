@@ -28,6 +28,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: FC<ProtectedRouteProps> = ({ children, redirectPath = '/auth' }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
   
   if (isLoading) {
     // Show loading state or minimal fallback
@@ -37,7 +38,8 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({ children, redirectPath = '/au
   }
   
   if (!isAuthenticated) {
-    return <Navigate to={redirectPath} replace />;
+    // Use the location state to remember where the user was trying to go
+    return <Navigate to={redirectPath} state={{ from: location.pathname }} replace />;
   }
   
   return <>{children}</>;
