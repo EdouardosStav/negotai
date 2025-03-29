@@ -24,8 +24,12 @@ const Logo = ({ location, scrollToSection }: LogoProps) => {
 
   return (
     <div className="flex items-center">
-      <a href="/" onClick={handleLogoClick} className="text-xl font-bold text-white hover:text-cyan transition-colors duration-300">
-        NegotAI
+      <a href="/" onClick={handleLogoClick} className="flex items-center hover:opacity-90 transition-opacity duration-300">
+        <img 
+          src="/lovable-uploads/df2c74f6-97d6-47a4-84d8-37c0bb9199e7.png" 
+          alt="NegotAI Logo" 
+          className="h-10 w-auto"
+        />
       </a>
     </div>
   );

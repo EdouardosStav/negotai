@@ -1,14 +1,15 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useToast } from "@/hooks/use-toast";
+
 const Testimonials = () => {
   const testimonialsRef = useRef<HTMLDivElement>(null);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -20,16 +21,19 @@ const Testimonials = () => {
     }, {
       threshold: 0.1
     });
+    
     const testimonialsEl = testimonialsRef.current;
     if (testimonialsEl) {
       observer.observe(testimonialsEl);
     }
+    
     return () => {
       if (testimonialsEl) {
         observer.unobserve(testimonialsEl);
       }
     };
   }, []);
+  
   const handleShareClick = () => {
     window.open("https://tally.so/r/wozOM5", "_blank");
     toast({
@@ -38,6 +42,7 @@ const Testimonials = () => {
       duration: 5000
     });
   };
+  
   const handleJoinClick = () => {
     window.open("mailto:earlyaccess@negotiai.com", "_blank");
     toast({
@@ -46,7 +51,9 @@ const Testimonials = () => {
       duration: 5000
     });
   };
-  return <section id="testimonials" className="py-20 md:py-32 relative">
+  
+  return (
+    <section id="testimonials" className="py-20 md:py-32 relative">
       {/* Background elements */}
       <div className="absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
       <div className="absolute bottom-0 right-0 left-0 h-px bg-gradient-to-r from-transparent via-cyan/30 to-transparent"></div>
@@ -140,6 +147,8 @@ const Testimonials = () => {
           
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Testimonials;
