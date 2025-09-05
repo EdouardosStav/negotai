@@ -1,163 +1,303 @@
 # NegotAI - AI-Powered Salary Negotiation Platform
 
-## 📌 Overview
+**Empowering professionals to negotiate competitive salaries with AI-driven insights**
 
-NegotAI is an AI-driven platform designed to help professionals analyze and negotiate their job offers with confidence. Leveraging OpenAI's API, real-time market data from LinkedIn, Glassdoor, and Payscale, and Supabase for authentication and data storage, NegotAI provides users with personalized salary insights and strategic negotiation recommendations.
+**Live Demo:** [www.negotai.site](https://www.negotai.site)
 
-## 🚀 Features
+---
 
-- **Salary Analysis**: Enter job details to receive AI-generated insights on your offer.
-- **Fairness Score**: Evaluate how competitive your salary offer is compared to industry standards.
-- **Suggested Counter-Offer**: AI-driven recommendations for an optimized salary request.
-- **Benefits Assessment**: Analyze non-monetary compensations such as bonuses, equity, and PTO.
-- **User Dashboard**: Save and track salary negotiations.
-- **Authentication**: Secure login using Supabase Auth.
-- **Modern UI**: Built with React, TailwindCSS, and ShadCN for a sleek, user-friendly experience.
+## Overview
 
-## 🏗️ Tech Stack
+**NegotAI** is a cutting-edge platform that leverages artificial intelligence to analyze job offers and provide personalized salary negotiation strategies. Built with a modern tech stack, it offers professionals the insights and confidence needed to secure competitive compensation packages.
 
-### Frontend
+### Key Features
 
-- **React.js** - Component-based UI library
-- **TypeScript** - Ensuring type safety
-- **Vite** - Fast and optimized build tool
-- **ShadCN/UI** - Modern component library
-- **TailwindCSS** - Responsive styling
+- **AI-Powered Analysis**: Advanced algorithms analyze your job offer against market standards
+- **Fairness Score**: Objective evaluation of your offer's competitiveness (0-100 scale)
+- **Smart Counter-Offers**: Data-driven salary suggestions based on role, experience, and location
+- **Benefits Assessment**: Comprehensive evaluation of non-monetary compensation
+- **User Dashboard**: Personal workspace to track and manage multiple negotiations
+- **Secure Authentication**: Enterprise-grade security with Supabase Auth
+- **Modern UI/UX**: Responsive design with smooth animations and intuitive navigation
 
-### Backend & Database
+---
 
-- **Supabase** - Authentication, database, and edge functions
-- **OpenAI API** - AI-powered salary analysis and negotiation insights
-- **Edge Functions** - Serverless execution for real-time processing
+## Architecture & Technology
 
-### DevOps & Deployment
+### Frontend Stack
+- **React 18** - Component-based UI with hooks and modern patterns
+- **TypeScript** - Type-safe development with enhanced developer experience
+- **Vite** - Next-generation frontend tooling for lightning-fast development
+- **TailwindCSS** - Utility-first CSS framework for rapid UI development
+- **ShadcN/UI** - High-quality, accessible component library
+- **Recharts** - Powerful charting library for data visualizations
+- **React Router** - Declarative routing with protected routes
 
-- **GitHub Actions** - Automated CI/CD workflows
-- **Vercel** - Frontend hosting for fast performance
-- **Docker** (Optional) - Containerized local development
+### Backend & Infrastructure
+- **Supabase** - Backend-as-a-Service with PostgreSQL database
+- **Supabase Auth** - User authentication and authorization
+- **OpenAI Integration** - AI-powered analysis (production version)
+- **Vercel** - Optimized deployment with global CDN
+- **TypeScript** - End-to-end type safety
 
-## 📂 Project Structure
+### Development Tools
+- **ESLint** - Code linting with TypeScript rules
+- **Custom Hooks** - Reusable logic for state management
+- **Component-Driven Architecture** - Modular and maintainable codebase
+- **Responsive Design** - Mobile-first approach with modern CSS
+
+---
+
+## Project Structure
 
 ```
-📦 negotai
-├── 📂 public                 # Static assets (favicons, images)
-├── 📂 src                    # Main application source code
-│   ├── 📂 components         # Reusable UI components
-│   ├── 📂 context            # React contexts for global state
-│   ├── 📂 hooks              # Custom hooks
-│   ├── 📂 integrations       # API integrations
-│   ├── 📂 lib                # Utility functions
-│   ├── 📂 pages              # Page components (e.g., Dashboard, Salary Analysis)
-│   ├── 📂 services           # API and data-fetching logic
-│   ├── 📂 utils              # Helper functions
-├── 📂 supabase               # Supabase edge functions & config
-├── 📜 index.html             # HTML entry point
-├── 📜 package.json           # Dependencies and scripts
-├── 📜 README.md              # Project documentation
-├── 📜 vite.config.ts         # Vite configuration
-└── 📜 tailwind.config.ts     # TailwindCSS configuration
+negotai/
+├── public/                      # Static assets
+│   ├── negotiai-favicon.ico     # Brand favicon
+│   └── 404.html                 # GitHub Pages fallback
+├── src/
+│   ├── components/              # Reusable UI components
+│   │   ├── analysis/            # Salary analysis form & results
+│   │   ├── dashboard/           # User dashboard components
+│   │   ├── forms/               # Contact & modal forms
+│   │   ├── legal/               # Privacy, Terms components
+│   │   ├── navbar/              # Navigation components
+│   │   └── ui/                  # ShadcN UI components
+│   ├── context/                 # React Context providers
+│   │   └── AuthContext.tsx      # Authentication state
+│   ├── hooks/                   # Custom React hooks
+│   │   ├── analysis/            # Analysis-specific hooks
+│   │   ├── useProfileData.tsx   # User profile management
+│   │   └── useSalaryAnalyses.tsx # Analysis data management
+│   ├── integrations/            # External service integrations
+│   │   └── supabase/            # Supabase client & types
+│   ├── pages/                   # Route components
+│   │   ├── Dashboard.tsx        # User dashboard
+│   │   ├── Analysis.tsx         # Salary analysis page
+│   │   └── Auth.tsx             # Authentication page
+│   ├── services/                # API and business logic
+│   │   ├── analysisService.ts   # Salary analysis operations
+│   │   └── types/               # TypeScript type definitions
+│   ├── utils/                   # Utility functions
+│   │   └── analysisUtils.ts     # Analysis calculations
+│   └── data/                    # Static data and configurations
+│       └── faq.ts               # FAQ content
+├── package.json                 # Dependencies and scripts
+├── vite.config.ts              # Vite configuration
+├── tailwind.config.ts          # TailwindCSS configuration
+├── tsconfig.json               # TypeScript configuration
+└── eslint.config.js            # ESLint configuration
 ```
 
-## 🔧 Setup & Installation
+---
+
+## Getting Started
 
 ### Prerequisites
 
-Ensure you have the following installed:
+- Node.js (v18 or higher)
+- npm or yarn package manager
+- Git
 
-- Node.js (v16+)
-- npm or yarn
-- Supabase account and project setup
-- OpenAI API Key
+### Installation
 
-### Steps to Run Locally
-
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/negotai.git
+   git clone https://github.com/EdouardosStav/negotai.git
    cd negotai
    ```
-2. Install dependencies:
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
-3. Configure environment variables: Create a `.env` file in the root directory and add:
-   ```env
-   VITE_SUPABASE_URL=your_supabase_url
+
+3. **Environment Setup**
+   ```bash
+   # Create environment file
+   cp .env.example .env.local
+   
+   # Add your configuration
+   VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   VITE_OPENAI_API_KEY=your_openai_api_key
    ```
-4. Start the development server:
+
+4. **Start development server**
    ```bash
    npm run dev
    ```
 
-## 🚀 Deployment
-
-### Deploying to Vercel
-
-1. Install Vercel CLI:
+5. **Build for production**
    ```bash
-   npm install -g vercel
-   ```
-2. Login to Vercel:
-   ```bash
-   vercel login
-   ```
-3. Deploy the project:
-   ```bash
-   vercel
+   npm run build
    ```
 
-## 🤖 API Usage
+### Available Scripts
 
-### Salary Analysis Request
-
-Endpoint: `POST /api/analyze-offer`
-
-#### Request Payload
-
-```json
-{
-  "jobTitle": "Software Engineer",
-  "companyName": "TechCorp Inc.",
-  "jobLevel": "Senior",
-  "employmentType": "Full-Time",
-  "experienceYears": "3-5 years",
-  "location": "San Francisco, CA",
-  "offeredSalary": 120000,
-  "benefits": "Health Insurance, 2% Equity, 8% Bonus, Hybrid Work, 15 PTO Days"
-}
-```
-
-#### Response
-
-```json
-{
-  "fairnessScore": 75,
-  "suggestedCounterOffer": 134400,
-  "marketComparison": "Your offer is in the 70% range compared to industry standards.",
-  "benefitsAnalysis": "Your equity (2%) is competitive, but PTO (15 days) is below the industry average (20 days).",
-  "negotiationTips": [
-    "Request 20 PTO days",
-    "Negotiate for a 10% performance bonus",
-    "Ask about professional development budget"
-  ]
-}
-```
-
-## 📜 License
-
-This project is licensed under the MIT License.
-
-## ✨ Contributors
-
-- **Edouardos Stavrakis** - Creator & Developer
-
-## 📬 Contact
-
-For inquiries, reach out via [info@negotai.site](mailto\:info@negotai.site)
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build production-ready application
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint for code quality checks
 
 ---
 
-Feel free to modify and add more details as necessary!
+## Core Features Deep Dive
 
+### Salary Analysis Engine
+
+The platform's core functionality revolves around a sophisticated analysis system that evaluates job offers across multiple dimensions:
+
+**Analysis Components:**
+- **Market Benchmarking**: Compares offered salary against industry standards
+- **Location Adjustment**: Factors in cost of living and regional salary variations
+- **Experience Weighting**: Adjusts recommendations based on career level
+- **Benefits Valuation**: Quantifies non-monetary compensation packages
+
+**Fairness Score Calculation:**
+```typescript
+interface AnalysisInput {
+  jobTitle: string;
+  companyName: string;
+  jobLevel: 'Entry' | 'Mid' | 'Senior' | 'Lead' | 'Principal';
+  employmentType: 'Full-Time' | 'Part-Time' | 'Contract';
+  experience: string;
+  location: string;
+  salary: number;
+  benefitsPackage: string;
+}
+```
+
+### User Dashboard
+
+Comprehensive workspace for managing salary negotiations:
+
+- **Analysis History**: Track all previous salary evaluations
+- **Negotiation Status**: Monitor progress of ongoing negotiations
+- **Profile Management**: Update professional information and preferences
+- **Export Functionality**: Download analysis reports for reference
+
+### Authentication & Security
+
+Built with enterprise-grade security practices:
+
+- **Supabase Auth**: Secure user authentication with email/password
+- **Protected Routes**: Client-side route protection
+- **Data Encryption**: All sensitive data encrypted at rest
+- **Privacy Controls**: User data deletion and export capabilities
+
+---
+
+## Development Architecture
+
+### Component Design Patterns
+
+**Custom Hooks Strategy:**
+- `useAnalysisState` - Manages form state and analysis results
+- `useProfileData` - Handles user profile information
+- `useSalaryAnalyses` - Manages analysis history and operations
+
+**State Management:**
+- React Context for global authentication state
+- Local component state for UI interactions
+- Custom hooks for business logic encapsulation
+
+**Type Safety:**
+- Comprehensive TypeScript interfaces for all data structures
+- Strict type checking enabled across the entire codebase
+- Generated types from Supabase schema
+
+---
+
+## API Integration
+
+### Supabase Integration
+
+```typescript
+// Database Schema (Key Tables)
+interface SalaryAnalysis {
+  id: string;
+  user_id: string;
+  job_title: string;
+  company_name: string;
+  offered_salary: number;
+  fairness_score: number;
+  suggested_counteroffer: number;
+  negotiation_status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### Service Layer Architecture
+
+```typescript
+// Analysis Service Example
+export const analyzeSalaryOffer = async (
+  data: SalaryAnalysisInput
+): Promise<AnalysisResult> => {
+  // Implementation includes:
+  // - Input validation
+  // - Market data processing
+  // - AI analysis integration
+  // - Result calculation
+};
+```
+
+---
+
+## Deployment & Production
+
+### Vercel Deployment
+
+The application is optimized for Vercel deployment with:
+
+- **Automatic deployments** from main branch
+- **Preview deployments** for pull requests
+- **Environment variable management**
+- **Custom domain configuration**
+
+### Performance Monitoring
+
+- **Core Web Vitals tracking**
+- **Error monitoring and reporting**
+- **Analytics integration**
+- **Performance budgets and alerts**
+
+---
+
+### Code Standards
+
+- Follow TypeScript best practices
+- Maintain component documentation
+- Write meaningful commit messages
+- Ensure all tests pass before submitting
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Author & Contact
+
+**Edouardos Stavrakis**  
+*AI Engineer | Tech Consultant | Founder @ NegotAI*
+
+- **LinkedIn**: [edouardosstavrakis](https://www.linkedin.com/in/edouardosstavrakis/)
+- **GitHub**: [EdouardosStav](https://github.com/EdouardosStav)
+- **Email**: [info@negotai.site](mailto:info@negotai.site)
+
+---
+
+## Acknowledgments
+
+- **OpenAI** for powering the AI analysis capabilities
+- **Supabase** for providing robust backend infrastructure
+- **Vercel** for seamless deployment and hosting
+- **The open-source community** for the amazing tools and libraries
+
+---
+
+*This project represents a portfolio showcase of modern web development practices, combining cutting-edge AI technology with exceptional user experience design.*
