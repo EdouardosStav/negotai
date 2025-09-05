@@ -1,5 +1,5 @@
-
-project_id = "wdrdyvyzrxrzmotarpzp"
+# Use environment variable for project ID
+project_id = "${SUPABASE_PROJECT_ID}"
 
 [functions.analyze-salary]
 verify_jwt = false
